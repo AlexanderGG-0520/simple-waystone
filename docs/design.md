@@ -33,6 +33,8 @@ The readable name is carried by a separate invisible armor stand tagged `sws.lab
 
 The design prefers teleporting to the clickable waystone entity itself instead of treating raw coordinates as the primary target. The entity naturally carries its dimension by existing in that dimension.
 
+Live `minecraft:interaction` hitboxes are the source of truth for whether a waystone exists. The current prototype does not keep a separate durable `simple_waystone:waystones` metadata list. Admin listing and dialog teleport selection therefore rely on live loaded entities rather than stale storage records.
+
 ## Interaction Hitbox
 
 Right-click detection is implemented with an advancement in `data/simple_waystone/advancement/` using the `minecraft:player_interacted_with_entity` trigger. The predicate is intended to match only `minecraft:interaction` entities tagged as Simple Waystone clickable hitboxes, but it still requires in-game validation on Minecraft Java Edition 26.1.2.
@@ -79,6 +81,12 @@ trigger sws.select set 1
 
 Selecting a deleted, missing, unloaded, cross-dimension, or out-of-range waystone id shows an error and consumes no items. Teleporting remains free.
 
+The static dialog can still display buttons for ids that were deleted because the dialog JSON is fixed. The selection processor validates the chosen id against live `minecraft:interaction` hitboxes before teleporting; if no matching live hitbox exists, it resets `sws.select` and reports `[Simple Waystone] That destination no longer exists.`
+
+`simple_waystone:admin/cleanup` is a safe maintenance function for loaded chunks. It clears pending selection/destination tags, removes any optional stale `simple_waystone:waystones` storage list if present, and removes orphaned visual markers or name labels that no longer have a live interaction hitbox with the same `sws.id`.
+
+`simple_waystone:admin/delete_all` additionally resets `#next sws.id` to `0`, so a full wipe returns the prototype id state to empty.
+
 ## Cost Model
 
 Creating a waystone is intentionally expensive so waystones feel like server infrastructure rather than a disposable travel item. Using an existing waystone is free, and deletion does not refund items.
@@ -109,6 +117,7 @@ Other public validation commands:
 - `/function simple_waystone:admin/list`
 - `/function simple_waystone:admin/delete_nearest`
 - `/function simple_waystone:admin/delete_all`
+- `/function simple_waystone:admin/cleanup`
 - `/function simple_waystone:teleport/to_nearest`
 - `/function simple_waystone:debug/state`
 - `/function simple_waystone:debug/nearest`
@@ -119,6 +128,7 @@ The create function uses Minecraft function macros for the name. Macro behavior 
 ## Known Limitations
 
 - The dialog menu is limited to waystone ids 1 through 8.
+- Static dialog buttons may remain visible for deleted ids, but selection validates live entities and rejects stale ids.
 - The dialog display and action behavior require Minecraft Java Edition 26.1.2 runtime validation.
 - Listing waystones only covers loaded waystone entities.
 - Runtime validation confirmed echo-shard core creation, item consumption, visible marker creation, and readable display names.

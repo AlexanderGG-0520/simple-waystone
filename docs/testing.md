@@ -249,7 +249,7 @@ Delete a waystone, then open the dialog and select its old id.
 
 Expected:
 
-- a clear error says the selected waystone is not available in this loaded dimension;
+- a clear error says `[Simple Waystone] That destination no longer exists.`;
 - no items are consumed;
 - `sws.select` resets to `0`.
 
@@ -285,6 +285,27 @@ Expected:
 
 Run the list command again to confirm it is gone from loaded entities.
 
+Open the dialog and select the deleted id.
+
+Expected:
+
+- `[Simple Waystone] That destination no longer exists.` appears;
+- the player is not teleported;
+- no items are consumed;
+- `sws.select` resets to `0`.
+
+Run:
+
+```mcfunction
+/function simple_waystone:admin/cleanup
+```
+
+Expected:
+
+- cleanup reports completion;
+- orphaned loaded visual markers or name labels without a matching live interaction hitbox are removed;
+- pending `sws.select` values and temporary destination tags are cleared.
+
 ## Delete All Waystones
 
 Run:
@@ -297,6 +318,25 @@ Expected:
 
 - all loaded Simple Waystone clickable interaction hitboxes, visual markers, and name labels are killed;
 - no items are refunded.
+- pending `sws.select` values are reset;
+- optional stale `simple_waystone:waystones` storage is removed if it exists.
+- `#next sws.id` is reset to `0`.
+
+Run:
+
+```mcfunction
+/function simple_waystone:admin/list
+```
+
+Expected: the list shows `- none`.
+
+Create a new waystone after `delete_all`.
+
+Expected:
+
+- creation still works;
+- the new waystone receives a valid id, usually `1` after `delete_all`;
+- selecting old deleted ids shows `[Simple Waystone] That destination no longer exists.` unless a new live waystone reused or owns that id.
 
 ## Inspect Storage And Scoreboards
 
@@ -452,6 +492,7 @@ These commands are duplicated here as a compact copy-paste checklist. Each comma
 /trigger sws.select set 1
 /function simple_waystone:admin/delete_nearest
 /function simple_waystone:admin/delete_all
+/function simple_waystone:admin/cleanup
 /data get storage simple_waystone:config
 /data get entity @e[type=minecraft:interaction,tag=sws.waystone,tag=sws.clickable,sort=nearest,limit=1]
 /data get entity @e[type=minecraft:armor_stand,tag=sws.waystone,tag=sws.label,sort=nearest,limit=1]

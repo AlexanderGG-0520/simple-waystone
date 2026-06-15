@@ -102,9 +102,11 @@ Lists currently loaded waystone interaction hitbox entities.
 ```mcfunction
 /function simple_waystone:admin/delete_nearest
 /function simple_waystone:admin/delete_all
+/function simple_waystone:admin/cleanup
 ```
 
 Deleting a waystone does not refund the creation cost.
+`admin/cleanup` removes transient selection state and orphaned loaded marker/name entities while treating live `minecraft:interaction` hitboxes as the source of truth.
 
 ### Use the Nearest Waystone
 
@@ -119,6 +121,8 @@ Using a waystone is free. The current prototype is expected to teleport the exec
 Right-clicking an existing waystone opens the `simple_waystone:destinations` dialog. The current prototype uses a fixed dialog with destination buttons for waystone ids 1 through 8.
 
 Dialog buttons run the trigger command `trigger sws.select set <id>`, so non-OP players can select destinations without direct `/function` access. A lightweight tick function processes only players with pending `sws.select` values, teleports them for free to a matching loaded waystone in the current dimension, and resets the selection score.
+
+Selection always validates that a live `minecraft:interaction` waystone hitbox with the selected id exists before teleporting. Deleted or stale ids are rejected with `[Simple Waystone] That destination no longer exists.`
 
 ### Debug Functions
 
@@ -149,6 +153,7 @@ All command examples are written as single executable lines for Minecraft chat o
 /trigger sws.select set 1
 /function simple_waystone:admin/delete_nearest
 /function simple_waystone:admin/delete_all
+/function simple_waystone:admin/cleanup
 /data get storage simple_waystone:config
 /data get entity @e[type=minecraft:interaction,tag=sws.waystone,tag=sws.clickable,sort=nearest,limit=1]
 /data get entity @e[type=minecraft:armor_stand,tag=sws.waystone,tag=sws.label,sort=nearest,limit=1]

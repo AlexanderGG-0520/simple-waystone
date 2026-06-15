@@ -49,8 +49,10 @@ JSON text component arguments are avoided because runtime testing showed they co
 ## Prototype Scope
 
 - Destination selection uses a fixed Java Edition dialog with buttons for waystone ids 1 through 8.
+- Deleted ids can still appear as static dialog buttons, but selection is validated against live `minecraft:interaction` hitboxes and stale ids are rejected safely.
 - Dialog display and `trigger sws.select set <id>` button action behavior require Minecraft Java Edition 26.1.2 runtime validation.
 - The dialog does not dynamically list waystone names and has no pagination yet.
 - Teleporting from the dialog targets the selected loaded waystone entity in the current dimension and is free.
 - Listing only includes loaded waystone entities.
 - A lightweight tick function is used only to process players with pending `sws.select` trigger values.
+- `simple_waystone:admin/cleanup` only repairs loaded chunks. It cannot clean unloaded waystone entities until those chunks are loaded.
