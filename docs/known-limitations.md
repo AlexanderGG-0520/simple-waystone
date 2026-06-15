@@ -4,7 +4,7 @@ Simple Waystone is currently an implementation prototype that requires in-game v
 
 ## Runtime Validation
 
-- Runtime testing found and fixed the previous lodestone core, echo-shard trigger, and raw JSON name issues. The new interaction-hitbox right-click path still needs Minecraft Java Edition 26.1.2 runtime validation.
+- Runtime testing found and fixed the previous lodestone core, echo-shard trigger, raw JSON name, and armor stand click-target issues. The dialog display fix still needs Minecraft Java Edition 26.1.2 runtime validation.
 - JSON files have been validated with `jq`, but command parsing and advancement behavior still need Minecraft runtime validation.
 - Function macro behavior must be tested on the target version.
 
@@ -23,7 +23,7 @@ JSON text component arguments are avoided because runtime testing showed they co
 
 - Runtime testing showed that the previous invisible armor stand click target did not open the dialog reliably.
 - New waystones use an invisible `minecraft:interaction` entity as the clickable hitbox and keep the armor stand only as a readable name label.
-- The `minecraft:interaction` advancement predicate and hitbox size need Minecraft Java Edition 26.1.2 runtime validation.
+- Runtime validation confirmed the interaction hitbox can trigger the right-click reward and print the menu-opening message.
 - The visible lodestone marker is a `block_display`; it is not a real placed block and does not itself handle clicks.
 - The datapack does not use `Marker:1b` for clickable entities. The separate armor stand name label may use `Marker:1b` so it does not intercept clicks.
 - The current advancement reward does not use an exact clicked-entity handle. It resolves the nearest tagged waystone within four blocks after the advancement fires.
@@ -49,7 +49,7 @@ JSON text component arguments are avoided because runtime testing showed they co
 ## Prototype Scope
 
 - Destination selection uses a fixed Java Edition dialog with buttons for waystone ids 1 through 8.
-- Dialog JSON syntax and `/trigger` button action behavior require Minecraft Java Edition 26.1.2 runtime validation.
+- Dialog display and `trigger sws.select set <id>` button action behavior require Minecraft Java Edition 26.1.2 runtime validation.
 - The dialog does not dynamically list waystone names and has no pagination yet.
 - Teleporting from the dialog targets the selected loaded waystone entity in the current dimension and is free.
 - Listing only includes loaded waystone entities.

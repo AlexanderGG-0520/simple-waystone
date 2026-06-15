@@ -1,5 +1,6 @@
 {
   "type": "minecraft:multi_action",
+  "after_action": "close",
   "title": {
     "text": "Simple Waystone"
   },
@@ -17,8 +18,8 @@
         "text": "Waystone #1"
       },
       "action": {
-        "type": "minecraft:run_command",
-        "command": "/trigger sws.select set 1"
+        "type": "run_command",
+        "command": "trigger sws.select set 1"
       }
     },
     {
@@ -26,8 +27,8 @@
         "text": "Waystone #2"
       },
       "action": {
-        "type": "minecraft:run_command",
-        "command": "/trigger sws.select set 2"
+        "type": "run_command",
+        "command": "trigger sws.select set 2"
       }
     },
     {
@@ -35,8 +36,8 @@
         "text": "Waystone #3"
       },
       "action": {
-        "type": "minecraft:run_command",
-        "command": "/trigger sws.select set 3"
+        "type": "run_command",
+        "command": "trigger sws.select set 3"
       }
     },
     {
@@ -44,8 +45,8 @@
         "text": "Waystone #4"
       },
       "action": {
-        "type": "minecraft:run_command",
-        "command": "/trigger sws.select set 4"
+        "type": "run_command",
+        "command": "trigger sws.select set 4"
       }
     },
     {
@@ -53,8 +54,8 @@
         "text": "Waystone #5"
       },
       "action": {
-        "type": "minecraft:run_command",
-        "command": "/trigger sws.select set 5"
+        "type": "run_command",
+        "command": "trigger sws.select set 5"
       }
     },
     {
@@ -62,8 +63,8 @@
         "text": "Waystone #6"
       },
       "action": {
-        "type": "minecraft:run_command",
-        "command": "/trigger sws.select set 6"
+        "type": "run_command",
+        "command": "trigger sws.select set 6"
       }
     },
     {
@@ -71,8 +72,8 @@
         "text": "Waystone #7"
       },
       "action": {
-        "type": "minecraft:run_command",
-        "command": "/trigger sws.select set 7"
+        "type": "run_command",
+        "command": "trigger sws.select set 7"
       }
     },
     {
@@ -80,10 +81,15 @@
         "text": "Waystone #8"
       },
       "action": {
-        "type": "minecraft:run_command",
-        "command": "/trigger sws.select set 8"
+        "type": "run_command",
+        "command": "trigger sws.select set 8"
       }
     }
   ],
-  "columns": 2
+  "columns": 2,
+  "exit_action": {
+    "label": {
+      "text": "Cancel"
+    }
+  }
 }

@@ -189,6 +189,7 @@ Then right-click the visible waystone body.
 Expected:
 
 - a `[Simple Waystone] Opening menu...` message appears;
+- a `[Simple Waystone] Showing destination dialog...` message appears;
 - the advancement reward runs;
 - the advancement is revoked after handling, allowing repeated tests;
 - the Simple Waystone dialog opens with destination buttons.
@@ -220,6 +221,8 @@ Create at least two waystones, then right-click one of them to open the dialog.
 
 Expected:
 
+- the right-click handler prints `[Simple Waystone] Opening menu...`;
+- `simple_waystone:menu/open` prints `[Simple Waystone] Showing destination dialog...`;
 - the UI is the Java Edition dialog-style menu, not a chest GUI and not chat text;
 - the title is `Simple Waystone`;
 - the body says `Select a destination.`;
@@ -229,7 +232,7 @@ Select an existing destination.
 
 Expected:
 
-- the dialog action runs `/trigger sws.select set <id>`;
+- the dialog action runs `trigger sws.select set <id>`;
 - the lightweight tick processor teleports the player to the selected loaded waystone entity in the current dimension;
 - no items are consumed;
 - `sws.select` resets to `0`, so the player is not repeatedly teleported.
@@ -255,6 +258,14 @@ Test with a non-OP player if possible.
 Expected:
 
 - the player can use the dialog because the button action uses `/trigger`, not direct `/function` execution.
+
+If `Opening menu...` appears but `Showing destination dialog...` does not, inspect `data/simple_waystone/function/menu/open.mcfunction`.
+
+If both messages appear but no dialog opens:
+
+- run `/dialog show @s simple_waystone:destinations` manually as an operator;
+- inspect server logs for a dialog registry or JSON semantic error;
+- verify `data/simple_waystone/dialog/destinations.json` is present and loaded by `/reload`.
 
 ## Delete The Nearest Waystone
 

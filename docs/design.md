@@ -69,10 +69,10 @@ Right-clicking a waystone opens a Java Edition datapack dialog from `data/simple
 
 The first implementation is intentionally static: it has buttons for waystone ids 1 through 8. Datapack dialog JSON cannot currently enumerate arbitrary waystone entities and names at runtime in this prototype, so labels are `Waystone #1` through `Waystone #8`.
 
-Each button runs a non-OP-safe trigger command:
+Each button runs a non-OP-safe trigger command. In the dialog JSON command payload, this is written without the leading slash:
 
 ```mcfunction
-/trigger sws.select set 1
+trigger sws.select set 1
 ```
 
 `simple_waystone:menu/open` enables `sws.select` for the player before showing the dialog. A lightweight tick function then processes only players with pending `sws.select` values, teleports them to the matching loaded waystone entity in the current dimension, and resets the score. This keeps command execution out of direct `/function` access for normal players.
@@ -112,14 +112,14 @@ Other public validation commands:
 - `/function simple_waystone:teleport/to_nearest`
 - `/function simple_waystone:debug/state`
 - `/function simple_waystone:debug/nearest`
-- `/trigger sws.select set <id>` through dialog button actions
+- `trigger sws.select set <id>` through dialog button actions
 
 The create function uses Minecraft function macros for the name. Macro behavior must be validated on Minecraft Java Edition 26.1.2 before public distribution.
 
 ## Known Limitations
 
 - The dialog menu is limited to waystone ids 1 through 8.
-- The dialog syntax and action behavior require Minecraft Java Edition 26.1.2 runtime validation.
+- The dialog display and action behavior require Minecraft Java Edition 26.1.2 runtime validation.
 - Listing waystones only covers loaded waystone entities.
 - Runtime validation confirmed echo-shard core creation, item consumption, visible marker creation, and readable display names.
 - The visible marker is a visual-only `block_display`, not a real lodestone block.

@@ -118,7 +118,7 @@ Using a waystone is free. The current prototype is expected to teleport the exec
 
 Right-clicking an existing waystone opens the `simple_waystone:destinations` dialog. The current prototype uses a fixed dialog with destination buttons for waystone ids 1 through 8.
 
-Dialog buttons run `/trigger sws.select set <id>`, so non-OP players can select destinations without direct `/function` access. A lightweight tick function processes only players with pending `sws.select` values, teleports them for free to a matching loaded waystone in the current dimension, and resets the selection score.
+Dialog buttons run the trigger command `trigger sws.select set <id>`, so non-OP players can select destinations without direct `/function` access. A lightweight tick function processes only players with pending `sws.select` values, teleports them for free to a matching loaded waystone in the current dimension, and resets the selection score.
 
 ### Debug Functions
 
@@ -167,7 +167,7 @@ All command examples are written as single executable lines for Minecraft chat o
 - Armor stands are still used for readable name labels only, not as the clickable target.
 - Advancement rewards run as the player but do not provide a simple direct mcfunction handle for the clicked entity. The right-click handler therefore uses a nearest tagged waystone fallback within four blocks.
 - The function macro creation command must be revalidated on Minecraft Java Edition 26.1.2 after simplifying name handling.
-- The dialog syntax and `/trigger` action behavior require Minecraft Java Edition 26.1.2 runtime validation.
+- The dialog display and trigger action behavior require Minecraft Java Edition 26.1.2 runtime validation.
 - The latest right-click hitbox and dialog-opening fixes require another Minecraft Java Edition 26.1.2 runtime validation pass before public distribution.
 
 See [docs/testing.md](docs/testing.md) and [docs/known-limitations.md](docs/known-limitations.md).
