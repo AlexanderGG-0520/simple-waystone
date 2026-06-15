@@ -1,7 +1,7 @@
-# Create a named waystone at the executing player's position.
-# Requires a function macro argument:
-# /function simple_waystone:admin/create_here {name:'{"text":"Hub","color":"aqua","italic":false}'}
+# Player-facing Waystone Core use flow.
+# Triggered by the lightweight carrot_on_a_stick use-stat poll in simple_waystone:tick.
 
+scoreboard players set @s sws.use_core 0
 function simple_waystone:internal/ensure_config
 function simple_waystone:internal/check_cost
 
@@ -9,12 +9,12 @@ scoreboard players set @s sws.tmp 1
 execute if entity @e[type=minecraft:armor_stand,tag=sws.waystone,tag=sws.clickable,distance=..2,sort=nearest,limit=1] run scoreboard players set @s sws.tmp 0
 execute unless score @s sws.has_cost matches 1 run scoreboard players set @s sws.tmp 0
 
-execute unless score @s sws.has_cost matches 1 run tellraw @s [{"text":"[Simple Waystone] ","color":"gold"},{"text":"Missing creation cost: 1 lodestone, 16 ender eyes, and 4 diamond blocks.","color":"red"}]
+execute unless score @s sws.has_cost matches 1 run tellraw @s [{"text":"[Simple Waystone] ","color":"gold"},{"text":"Waystone Core needs: 1 lodestone, 16 ender eyes, and 4 diamond blocks.","color":"red"}]
 execute if score @s sws.has_cost matches 1 if score @s sws.tmp matches 0 run tellraw @s [{"text":"[Simple Waystone] ","color":"gold"},{"text":"A waystone is already too close to this location.","color":"red"}]
 execute if score @s sws.tmp matches 1 run function simple_waystone:internal/consume_cost
 execute if score @s sws.tmp matches 1 run function simple_waystone:internal/next_id
 execute if score @s sws.tmp matches 1 run summon minecraft:block_display ~-0.5 ~ ~-0.5 {block_state:{Name:"minecraft:lodestone"},Tags:["sws.waystone","sws.visual","sws.pending"]}
-$execute if score @s sws.tmp matches 1 run summon minecraft:armor_stand ~ ~ ~ {Invisible:1b,Invulnerable:1b,NoGravity:1b,PersistenceRequired:1b,Silent:1b,CustomName:$(name),CustomNameVisible:1b,Tags:["sws.waystone","sws.clickable","sws.pending"]}
+execute if score @s sws.tmp matches 1 run summon minecraft:armor_stand ~ ~ ~ {Invisible:1b,Invulnerable:1b,NoGravity:1b,PersistenceRequired:1b,Silent:1b,CustomName:'[{"text":"Waystone #","color":"aqua","italic":false},{"score":{"name":"#next","objective":"sws.id"},"color":"aqua","italic":false}]',CustomNameVisible:1b,Tags:["sws.waystone","sws.clickable","sws.pending"]}
 execute if score @s sws.tmp matches 1 as @e[tag=sws.pending,sort=nearest,distance=..3] run scoreboard players operation @s sws.id = #next sws.id
 execute if score @s sws.tmp matches 1 as @e[tag=sws.pending,sort=nearest,distance=..3] run tag @s remove sws.pending
-execute if score @s sws.tmp matches 1 run tellraw @s [{"text":"[Simple Waystone] ","color":"gold"},{"text":"Created visible waystone #","color":"green"},{"score":{"name":"#next","objective":"sws.id"},"color":"green"},{"text":".","color":"green"}]
+execute if score @s sws.tmp matches 1 run tellraw @s [{"text":"[Simple Waystone] ","color":"gold"},{"text":"Created visible Waystone #","color":"green"},{"score":{"name":"#next","objective":"sws.id"},"color":"green"},{"text":".","color":"green"}]

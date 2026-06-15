@@ -29,8 +29,17 @@ This may become possible later with a separate wrapper or stricter name sanitiza
 
 - Right-click detection may need adjustment after in-game testing.
 - Invisible armor stands may be hard for players to interact with, even without `Marker:1b`.
+- The visible lodestone marker is a `block_display`; it is not a real placed block and does not itself handle clicks.
 - The datapack intentionally does not use `Marker:1b` because marker armor stands have a very small hitbox.
 - The current advancement reward does not use an exact clicked-entity handle. It resolves the nearest tagged waystone within four blocks after the advancement fires.
+
+## Item-Based Creation
+
+- The current Waystone Core is a prototype trigger based on `minecraft:carrot_on_a_stick`.
+- The helper currently gives a plain carrot on a stick instead of a custom-named item because item component syntax still needs runtime validation on Minecraft Java Edition 26.1.2.
+- Detection uses the `minecraft.used:minecraft.carrot_on_a_stick` scoreboard statistic and a lightweight tick function.
+- Any carrot on a stick use may trigger the prototype creation path. A fully custom filtered item requires future validation against Minecraft Java Edition 26.1.2 item component syntax.
+- Item-created waystones use generated names like `Waystone #<id>`. Custom naming currently uses the admin/testing function.
 
 ## Cost Configuration
 

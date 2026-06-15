@@ -42,12 +42,40 @@ If this function is unknown, check that the datapack installed with `pack.mcmeta
 Run:
 
 ```mcfunction
-/give @s minecraft:lodestone 2
-/give @s minecraft:ender_eye 32
-/give @s minecraft:diamond_block 8
+/give @s minecraft:lodestone 3
+/give @s minecraft:ender_eye 48
+/give @s minecraft:diamond_block 12
+/function simple_waystone:item/give_core
 ```
 
-This gives enough items for two default-cost waystones.
+This gives enough cost items for three default-cost waystones and one prototype Waystone Core trigger item.
+
+## Create A Visible Waystone With The Core Item
+
+Use the carrot on a stick received from `simple_waystone:item/give_core`.
+
+Expected:
+
+- one lodestone, sixteen ender eyes, and four diamond blocks are consumed;
+- a visible lodestone `block_display` marker appears;
+- an invisible clickable armor stand with a visible generated name like `Waystone #1` is created at the marker;
+- a message similar to `[Simple Waystone] Created visible Waystone #1.` appears.
+
+Run:
+
+```mcfunction
+/function simple_waystone:debug/nearest
+```
+
+Expected: the nearest clickable waystone id is printed.
+
+Run:
+
+```mcfunction
+/data get entity @e[type=minecraft:block_display,tag=sws.visual,sort=nearest,limit=1]
+```
+
+Expected: the nearest visual marker has a lodestone `block_state` and the `sws.waystone` / `sws.visual` tags. The matching `sws.id` is stored as a scoreboard value, not NBT.
 
 ## Create A Waystone Named Hub
 
@@ -60,8 +88,9 @@ The current implementation expects `name` to be a JSON text component string pas
 Expected:
 
 - one lodestone, sixteen ender eyes, and four diamond blocks are consumed;
-- an invisible armor stand with visible name `Hub` is created at your position;
-- a message similar to `[Simple Waystone] Created waystone #1.` appears.
+- a visible lodestone `block_display` marker appears;
+- an invisible armor stand with visible name `Hub` is created at the same location;
+- a message similar to `[Simple Waystone] Created visible waystone #<id>.` appears.
 
 ## Create A Second Waystone Named Mine
 
@@ -74,7 +103,7 @@ Move to a different location and run:
 Expected:
 
 - the second set of cost items is consumed;
-- a second named waystone armor stand is created;
+- a second visible marker and named waystone armor stand are created;
 - the created id advances.
 
 ## List Waystones
@@ -122,7 +151,7 @@ Expected:
 
 ## Test Right-Click Interaction
 
-Stand near the visible name of a waystone and right-click where the invisible armor stand should be.
+Stand near the visible lodestone marker and right-click where the invisible armor stand should be.
 
 Expected:
 
@@ -134,7 +163,7 @@ If nothing happens:
 
 - verify the armor stand was created without `Marker:1b`;
 - run `/function simple_waystone:debug/nearest` while standing near the name;
-- try clicking around the armor stand body, not only the floating name;
+- try clicking around the visible marker and armor stand body, not only the floating name;
 - inspect logs for advancement or command parsing errors.
 
 ## Delete The Nearest Waystone
@@ -148,6 +177,7 @@ Stand within four blocks of one waystone and run:
 Expected:
 
 - the nearest waystone armor stand is killed;
+- the matching visible `block_display` marker is killed;
 - no items are refunded;
 - a deletion message appears.
 
@@ -163,7 +193,7 @@ Run:
 
 Expected:
 
-- all loaded Simple Waystone armor stands are killed;
+- all loaded Simple Waystone clickable armor stands and visual markers are killed;
 - no items are refunded.
 
 ## Inspect Storage And Scoreboards
@@ -181,7 +211,7 @@ Expected:
 - config storage contains the default creation cost;
 - there is currently no separate `simple_waystone:waystones` storage; waystone state is held on loaded armor stand entities and scoreboards;
 - `#next sws.id` equals the highest assigned id;
-- `sws.id`, `sws.tmp`, and `sws.has_cost` exist.
+- `sws.id`, `sws.tmp`, `sws.has_cost`, and `sws.use_core` exist.
 
 To inspect nearby waystone entity data, stand near one and run:
 
@@ -190,6 +220,14 @@ To inspect nearby waystone entity data, stand near one and run:
 ```
 
 Expected: entity data includes `Invisible`, `Invulnerable`, `NoGravity`, `PersistenceRequired`, `Silent`, `CustomName`, and the `sws.waystone` / `sws.clickable` tags.
+
+To inspect the visual marker, run:
+
+```mcfunction
+/data get entity @e[type=minecraft:block_display,tag=sws.visual,sort=nearest,limit=1]
+```
+
+Expected: entity data includes a lodestone `block_state` and the `sws.waystone` / `sws.visual` tags.
 
 ## Retest Right-Click Advancement
 
@@ -215,6 +253,14 @@ Expected:
 - no items are consumed;
 - no waystone is created;
 - the next id does not advance.
+
+Also test the item flow without cost by using the carrot on a stick.
+
+Expected:
+
+- a Waystone Core missing-cost message appears;
+- no extra items are consumed;
+- no visible marker or clickable armor stand is created.
 
 ### Missing Macro Argument
 
@@ -252,9 +298,10 @@ These commands are duplicated here as a compact copy-paste checklist. Each comma
 ```mcfunction
 /reload
 /datapack list
-/give @s minecraft:lodestone 2
-/give @s minecraft:ender_eye 32
-/give @s minecraft:diamond_block 8
+/give @s minecraft:lodestone 3
+/give @s minecraft:ender_eye 48
+/give @s minecraft:diamond_block 12
+/function simple_waystone:item/give_core
 /function simple_waystone:admin/create_here {name:'{"text":"Hub","color":"aqua","italic":false}'}
 /function simple_waystone:admin/create_here {name:'{"text":"Mine","color":"gold","italic":false}'}
 /function simple_waystone:admin/list
@@ -265,5 +312,6 @@ These commands are duplicated here as a compact copy-paste checklist. Each comma
 /function simple_waystone:admin/delete_all
 /data get storage simple_waystone:config
 /data get entity @e[type=minecraft:armor_stand,tag=sws.waystone,sort=nearest,limit=1]
+/data get entity @e[type=minecraft:block_display,tag=sws.visual,sort=nearest,limit=1]
 /advancement revoke @s only simple_waystone:right_click_waystone
 ```

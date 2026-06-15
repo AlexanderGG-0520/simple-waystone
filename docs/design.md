@@ -13,14 +13,24 @@ Simple Waystone is intended to be a small server-side waystone datapack for Mine
 
 ## Multi-Waystone Prototype
 
-The currently implemented prototype is designed to represent each waystone as an in-world armor stand entity with:
+The currently implemented prototype separates a waystone into three concerns:
+
+- a visible marker;
+- a clickable interaction entity;
+- stored metadata on the entities and scoreboards.
+
+The visible marker is a `minecraft:block_display` rendering a lodestone block. It is visual-only and does not place or replace a real world block.
+
+The clickable interaction entity is still an invisible armor stand with:
 
 - tags `sws.waystone` and `sws.clickable`;
 - a stable numeric id in the `sws.id` scoreboard objective;
 - a visible `CustomName`;
 - its actual entity position and dimension as the teleport target.
 
-The design prefers teleporting to the waystone entity itself instead of treating raw coordinates as the primary target. The entity naturally carries its dimension by existing in that dimension.
+The `block_display` also has the same `sws.id` value and the tags `sws.waystone` and `sws.visual`, so delete operations can remove both pieces together.
+
+The design prefers teleporting to the clickable waystone entity itself instead of treating raw coordinates as the primary target. The entity naturally carries its dimension by existing in that dimension.
 
 ## Armor Stand Interaction
 
@@ -38,6 +48,16 @@ The armor stand is:
 `Marker:1b` is intentionally avoided because marker armor stands have an extremely small hitbox and are unreliable as right-click targets.
 
 The advancement reward calls `simple_waystone:interaction/right_click_waystone`, which immediately revokes the advancement from the player so future interactions should be able to trigger again.
+
+## Item-Based Creation
+
+Player-facing creation uses a prototype Waystone Core item based on `minecraft:carrot_on_a_stick`.
+
+The datapack adds a lightweight tick hook because the vanilla use statistic for carrot on a stick is the simplest practical way to detect this item use without adding a custom UI. The tick function only checks players whose `sws.use_core` score changed and then immediately resets that score.
+
+This keeps normal usage item-free after creation: the expensive cost is paid only when a waystone is created, and teleporting remains free.
+
+The admin/testing function `simple_waystone:admin/create_here` still exists because it supports precise macro-provided names and is useful for validation, server operators, and debugging. Item-based creation currently uses a generated name like `Waystone #<id>`.
 
 ## Clicked Entity Resolution
 
@@ -75,6 +95,7 @@ The desired simple UX below is a future improvement, not current behavior:
 
 Other public validation commands:
 
+- `/function simple_waystone:item/give_core`
 - `/function simple_waystone:admin/list`
 - `/function simple_waystone:admin/delete_nearest`
 - `/function simple_waystone:admin/delete_all`
@@ -90,6 +111,9 @@ The create function uses Minecraft function macros for the name. Macro behavior 
 - The current right-click behavior teleports the player to the same nearest waystone entity, primarily validating interaction and entity resolution.
 - Listing waystones only covers loaded waystone entities.
 - Runtime behavior has not been tested in Minecraft Java Edition 26.1.2 from this repository.
+- The visible marker is a visual-only `block_display`, not a real lodestone block.
+- The current Waystone Core trigger uses any `minecraft:carrot_on_a_stick` use; a fully custom filtered item needs future runtime validation.
+- The lightweight tick hook exists only for item-use detection.
 - Right-click detection may need adjustment after in-game testing.
 - Invisible armor stands may be hard for players to interact with.
 - The nearest-waystone fallback may not always be the same as exact clicked-entity detection.
