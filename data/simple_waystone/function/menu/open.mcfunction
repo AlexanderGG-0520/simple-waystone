@@ -1,5 +1,3 @@
-# Open the prototype destination dialog.
-
+tellraw @s {"text":"[Simple Waystone] Select destination","color":"aqua","bold":true}
 scoreboard players enable @s sws.select
-tellraw @s [{"text":"[Simple Waystone] ","color":"gold"},{"text":"Showing destination dialog...","color":"gray"}]
-dialog show @s simple_waystone:destinations
+function simple_waystone:menu/list

@@ -4,7 +4,7 @@ Simple Waystone is currently an implementation prototype that requires in-game v
 
 ## Runtime Validation
 
-- Runtime testing found and fixed the previous lodestone core, echo-shard trigger, raw JSON name, and armor stand click-target issues. The dialog display fix still needs Minecraft Java Edition 26.1.2 runtime validation.
+- Runtime testing found and fixed the previous lodestone core, echo-shard trigger, raw JSON name, and armor stand click-target issues. The clickable chat menu display fix still needs Minecraft Java Edition 26.1.2 runtime validation.
 - JSON files have been validated with `jq`, but command parsing and advancement behavior still need Minecraft runtime validation.
 - Function macro behavior must be tested on the target version.
 
@@ -21,7 +21,7 @@ JSON text component arguments are avoided because runtime testing showed they co
 
 ## Interaction Hitbox
 
-- Runtime testing showed that the previous invisible armor stand click target did not open the dialog reliably.
+- Runtime testing showed that the previous invisible armor stand click target did not open the clickable chat menu reliably.
 - New waystones use an invisible `minecraft:interaction` entity as the clickable hitbox and keep the armor stand only as a readable name label.
 - Runtime validation confirmed the interaction hitbox can trigger the right-click reward and print the menu-opening message.
 - The visible lodestone marker is a `block_display`; it is not a real placed block and does not itself handle clicks.
@@ -48,11 +48,11 @@ JSON text component arguments are avoided because runtime testing showed they co
 
 ## Prototype Scope
 
-- Destination selection uses a fixed Java Edition dialog with buttons for waystone ids 1 through 8.
-- Deleted ids can still appear as static dialog buttons, but selection is validated against live `minecraft:interaction` hitboxes and stale ids are rejected safely.
+- Destination selection uses a fixed Java Edition clickable chat menu with buttons for waystone ids 1 through 8.
+- Deleted ids can still appear as clickable chat buttons, but selection is validated against live `minecraft:interaction` hitboxes and stale ids are rejected safely.
 - Dialog display and `trigger sws.select set <id>` button action behavior require Minecraft Java Edition 26.1.2 runtime validation.
-- The dialog does not dynamically list waystone names and has no pagination yet.
-- Teleporting from the dialog targets the selected loaded waystone entity in the current dimension and is free.
+- The clickable chat menu does not dynamically list waystone names and has no pagination yet.
+- Teleporting from the clickable chat menu targets the selected loaded waystone entity in the current dimension and is free.
 - Listing only includes loaded waystone entities.
 - A lightweight tick function is used only to process players with pending `sws.select` trigger values.
 - `simple_waystone:admin/cleanup` only repairs loaded chunks. It cannot clean unloaded waystone entities until those chunks are loaded.

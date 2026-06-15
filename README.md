@@ -8,7 +8,7 @@ The project targets **Minecraft Java Edition 26.1.2** and data pack format **101
 
 Early development. The currently implemented prototype is designed to support visible waystone markers, multiple named waystone entities, expensive waystone creation, free waystone use, and right-click detection through a `minecraft:interaction` hitbox and advancement. It still requires in-game validation on Minecraft Java Edition 26.1.2.
 
-Right-clicking a waystone now opens a Java Edition datapack dialog-style destination menu. This is not a chest GUI and not a tellraw chat menu.
+Right-clicking a waystone now opens a Java Edition datapack clickable chat destination menu. This is not a chest GUI and not a tellraw chat menu.
 
 ## Installation
 
@@ -118,7 +118,7 @@ Using a waystone is free. The current prototype is expected to teleport the exec
 
 ### Destination Dialog
 
-Right-clicking an existing waystone opens the `simple_waystone:destinations` dialog. The current prototype uses a fixed dialog with destination buttons for waystone ids 1 through 8.
+Right-clicking an existing waystone opens the `simple_waystone:menu/open` clickable chat menu. The current prototype uses a fixed clickable chat menu with destination buttons for waystone ids 1 through 8.
 
 Dialog buttons run the trigger command `trigger sws.select set <id>`, so non-OP players can select destinations without direct `/function` access. A lightweight tick function processes only players with pending `sws.select` values, teleports them for free to a matching loaded waystone in the current dimension, and resets the selection score.
 
@@ -168,12 +168,12 @@ All command examples are written as single executable lines for Minecraft chat o
 - The visible lodestone marker is a `block_display`, not a real block.
 - The Waystone Core uses `minecraft:echo_shard`; a lodestone-based core was rejected because it placed a real block during runtime testing.
 - Runtime validation confirmed the current Waystone Core creation flow with `minecraft:using_item` and `minecraft:custom_data`.
-- The dialog menu is a fixed prototype for waystone ids 1 through 8; it does not dynamically list names yet.
+- The clickable chat menu is a fixed prototype for waystone ids 1 through 8; it does not dynamically list names yet.
 - Armor stands are still used for readable name labels only, not as the clickable target.
 - Advancement rewards run as the player but do not provide a simple direct mcfunction handle for the clicked entity. The right-click handler therefore uses a nearest tagged waystone fallback within four blocks.
 - The function macro creation command must be revalidated on Minecraft Java Edition 26.1.2 after simplifying name handling.
-- The dialog display and trigger action behavior require Minecraft Java Edition 26.1.2 runtime validation.
-- The latest right-click hitbox and dialog-opening fixes require another Minecraft Java Edition 26.1.2 runtime validation pass before public distribution.
+- The clickable chat menu display and trigger action behavior require Minecraft Java Edition 26.1.2 runtime validation.
+- The latest right-click hitbox and clickable chat menu-opening fixes require another Minecraft Java Edition 26.1.2 runtime validation pass before public distribution.
 
 See [docs/testing.md](docs/testing.md) and [docs/known-limitations.md](docs/known-limitations.md).
 

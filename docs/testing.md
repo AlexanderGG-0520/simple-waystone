@@ -1,6 +1,6 @@
 # Manual In-Game Test Plan
 
-Some runtime validation has been performed, and it confirmed the echo-shard Waystone Core creation flow after the previous lodestone core, echo-shard trigger, and raw JSON name issues were fixed. Use this checklist in a disposable Minecraft Java Edition 26.1.2 test world to validate the current right-click hitbox and dialog-opening fixes before public distribution.
+Some runtime validation has been performed, and it confirmed the echo-shard Waystone Core creation flow after the previous lodestone core, echo-shard trigger, and raw JSON name issues were fixed. Use this checklist in a disposable Minecraft Java Edition 26.1.2 test world to validate the current right-click hitbox and clickable chat menu-opening fixes before public distribution.
 
 ## Install
 
@@ -189,13 +189,13 @@ Then right-click the visible waystone body.
 Expected:
 
 - a `[Simple Waystone] Opening menu...` message appears;
-- a `[Simple Waystone] Showing destination dialog...` message appears;
+- a `[Simple Waystone] Showing destination clickable chat menu...` message appears;
 - the advancement reward runs;
 - the advancement is revoked after handling, allowing repeated tests;
-- the Simple Waystone dialog opens with destination buttons.
+- the Simple Waystone clickable chat menu opens with destination buttons.
 - button labels are readable, such as `Waystone #1`.
 
-Right-click the same waystone again after closing the dialog.
+Right-click the same waystone again after closing the clickable chat menu.
 
 Expected:
 
@@ -217,13 +217,13 @@ If nothing happens:
 
 ## Test Dialog Destination Selection
 
-Create at least two waystones, then right-click one of them to open the dialog.
+Create at least two waystones, then right-click one of them to open the clickable chat menu.
 
 Expected:
 
 - the right-click handler prints `[Simple Waystone] Opening menu...`;
-- `simple_waystone:menu/open` prints `[Simple Waystone] Showing destination dialog...`;
-- the UI is the Java Edition dialog-style menu, not a chest GUI and not chat text;
+- `simple_waystone:menu/open` prints `[Simple Waystone] Showing destination clickable chat menu...`;
+- the UI is the Java Edition clickable chat menu-style menu, not a chest GUI and not chat text;
 - the title is `Simple Waystone`;
 - the body says `Select a destination.`;
 - destination buttons are shown for `Waystone #1` through `Waystone #8`.
@@ -232,7 +232,7 @@ Select an existing destination.
 
 Expected:
 
-- the dialog action runs `trigger sws.select set <id>`;
+- the clickable chat menu action runs `trigger sws.select set <id>`;
 - the lightweight tick processor teleports the player to the selected loaded waystone entity in the current dimension;
 - no items are consumed;
 - `sws.select` resets to `0`, so the player is not repeatedly teleported.
@@ -245,7 +245,7 @@ To inspect the selection score after teleporting, run:
 
 Expected: the score is `0`.
 
-Delete a waystone, then open the dialog and select its old id.
+Delete a waystone, then open the clickable chat menu and select its old id.
 
 Expected:
 
@@ -257,15 +257,15 @@ Test with a non-OP player if possible.
 
 Expected:
 
-- the player can use the dialog because the button action uses `/trigger`, not direct `/function` execution.
+- the player can use the clickable chat menu because the button action uses `/trigger`, not direct `/function` execution.
 
-If `Opening menu...` appears but `Showing destination dialog...` does not, inspect `data/simple_waystone/function/menu/open.mcfunction`.
+If `Opening menu...` appears but `Showing destination clickable chat menu...` does not, inspect `data/simple_waystone/function/menu/open.mcfunction`.
 
-If both messages appear but no dialog opens:
+If both messages appear but no clickable chat menu opens:
 
-- run `/dialog show @s simple_waystone:destinations` manually as an operator;
-- inspect server logs for a dialog registry or JSON semantic error;
-- verify `data/simple_waystone/dialog/destinations.json` is present and loaded by `/reload`.
+- run `/clickable chat menu show @s simple_waystone:menu/open` manually as an operator;
+- inspect server logs for a clickable chat menu registry or JSON semantic error;
+- verify `data/simple_waystone/clickable chat menu/destinations.json` is present and loaded by `/reload`.
 
 ## Delete The Nearest Waystone
 
@@ -285,7 +285,7 @@ Expected:
 
 Run the list command again to confirm it is gone from loaded entities.
 
-Open the dialog and select the deleted id.
+Open the clickable chat menu and select the deleted id.
 
 Expected:
 
@@ -503,7 +503,7 @@ These commands are duplicated here as a compact copy-paste checklist. Each comma
 
 ## Tick Processing Check
 
-Verify that item creation no longer uses tick polling, and that the only tick hook is for dialog selection processing:
+Verify that item creation no longer uses tick polling, and that the only tick hook is for clickable chat menu selection processing:
 
 ```mcfunction
 /scoreboard objectives list

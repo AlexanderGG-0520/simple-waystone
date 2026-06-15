@@ -33,7 +33,7 @@ The readable name is carried by a separate invisible armor stand tagged `sws.lab
 
 The design prefers teleporting to the clickable waystone entity itself instead of treating raw coordinates as the primary target. The entity naturally carries its dimension by existing in that dimension.
 
-Live `minecraft:interaction` hitboxes are the source of truth for whether a waystone exists. The current prototype does not keep a separate durable `simple_waystone:waystones` metadata list. Admin listing and dialog teleport selection therefore rely on live loaded entities rather than stale storage records.
+Live `minecraft:interaction` hitboxes are the source of truth for whether a waystone exists. The current prototype does not keep a separate durable `simple_waystone:waystones` metadata list. Admin listing and clickable chat menu teleport selection therefore rely on live loaded entities rather than stale storage records.
 
 ## Interaction Hitbox
 
@@ -63,25 +63,25 @@ The Waystone Core is consumed during item-based creation. The item-created cost 
 
 Vanilla advancement rewards run as the player, but this prototype does not assume a direct reliable mcfunction handle to the clicked entity. After the tagged interaction advancement fires, the handler resolves the nearest tagged waystone within four blocks.
 
-This is a constrained fallback used to decide whether the player is close enough to a waystone to open the destination dialog. If it proves unreliable in Minecraft Java Edition 26.1.2, the interaction hitbox dimensions or advancement predicate should be adjusted directly.
+This is a constrained fallback used to decide whether the player is close enough to a waystone to open the destination clickable chat menu. If it proves unreliable in Minecraft Java Edition 26.1.2, the interaction hitbox dimensions or advancement predicate should be adjusted directly.
 
 ## Dialog Destination Menu
 
-Right-clicking a waystone opens a Java Edition datapack dialog from `data/simple_waystone/dialog/destinations.json`. The dialog is intended to use the vanilla dialog UI, not a chest/container GUI and not a tellraw chat menu.
+Right-clicking a waystone opens a Java Edition datapack clickable chat menu from `data/simple_waystone/clickable chat menu/destinations.json`. The clickable chat menu is intended to use the vanilla clickable chat menu UI, not a chest/container GUI and not a tellraw chat menu.
 
-The first implementation is intentionally static: it has buttons for waystone ids 1 through 8. Datapack dialog JSON cannot currently enumerate arbitrary waystone entities and names at runtime in this prototype, so labels are `Waystone #1` through `Waystone #8`.
+The first implementation is intentionally static: it has buttons for waystone ids 1 through 8. Datapack clickable chat menu JSON cannot currently enumerate arbitrary waystone entities and names at runtime in this prototype, so labels are `Waystone #1` through `Waystone #8`.
 
-Each button runs a non-OP-safe trigger command. In the dialog JSON command payload, this is written without the leading slash:
+Each button runs a non-OP-safe trigger command. In the clickable chat menu JSON command payload, this is written without the leading slash:
 
 ```mcfunction
 trigger sws.select set 1
 ```
 
-`simple_waystone:menu/open` enables `sws.select` for the player before showing the dialog. A lightweight tick function then processes only players with pending `sws.select` values, teleports them to the matching loaded waystone entity in the current dimension, and resets the score. This keeps command execution out of direct `/function` access for normal players.
+`simple_waystone:menu/open` enables `sws.select` for the player before showing the clickable chat menu. A lightweight tick function then processes only players with pending `sws.select` values, teleports them to the matching loaded waystone entity in the current dimension, and resets the score. This keeps command execution out of direct `/function` access for normal players.
 
 Selecting a deleted, missing, unloaded, cross-dimension, or out-of-range waystone id shows an error and consumes no items. Teleporting remains free.
 
-The static dialog can still display buttons for ids that were deleted because the dialog JSON is fixed. The selection processor validates the chosen id against live `minecraft:interaction` hitboxes before teleporting; if no matching live hitbox exists, it resets `sws.select` and reports `[Simple Waystone] That destination no longer exists.`
+The clickable chat can still display buttons for ids that were deleted because the clickable chat menu JSON is fixed. The selection processor validates the chosen id against live `minecraft:interaction` hitboxes before teleporting; if no matching live hitbox exists, it resets `sws.select` and reports `[Simple Waystone] That destination no longer exists.`
 
 `simple_waystone:admin/cleanup` is a safe maintenance function for loaded chunks. It clears pending selection/destination tags, removes any optional stale `simple_waystone:waystones` storage list if present, and removes orphaned visual markers or name labels that no longer have a live interaction hitbox with the same `sws.id`.
 
@@ -121,20 +121,20 @@ Other public validation commands:
 - `/function simple_waystone:teleport/to_nearest`
 - `/function simple_waystone:debug/state`
 - `/function simple_waystone:debug/nearest`
-- `trigger sws.select set <id>` through dialog button actions
+- `trigger sws.select set <id>` through clickable chat menu button actions
 
 The create function uses Minecraft function macros for the name. Macro behavior must be validated on Minecraft Java Edition 26.1.2 before public distribution.
 
 ## Known Limitations
 
-- The dialog menu is limited to waystone ids 1 through 8.
-- Static dialog buttons may remain visible for deleted ids, but selection validates live entities and rejects stale ids.
-- The dialog display and action behavior require Minecraft Java Edition 26.1.2 runtime validation.
+- The clickable chat menu is limited to waystone ids 1 through 8.
+- Static clickable chat menu buttons may remain visible for deleted ids, but selection validates live entities and rejects stale ids.
+- The clickable chat menu display and action behavior require Minecraft Java Edition 26.1.2 runtime validation.
 - Listing waystones only covers loaded waystone entities.
 - Runtime validation confirmed echo-shard core creation, item consumption, visible marker creation, and readable display names.
 - The visible marker is a visual-only `block_display`, not a real lodestone block.
 - A lodestone-based Waystone Core was runtime-tested and rejected because it placed a real block.
-- The `minecraft:interaction` right-click hitbox and dialog-opening path need runtime validation on Minecraft Java Edition 26.1.2.
+- The `minecraft:interaction` right-click hitbox and clickable chat menu-opening path need runtime validation on Minecraft Java Edition 26.1.2.
 - Right-click detection now uses `minecraft:interaction` and needs another in-game validation pass.
 - Existing waystones created by older prototype versions may still have armor stand click targets; recreate them after updating the datapack.
 - The nearest-waystone fallback may not always be the same as exact clicked-entity detection.
