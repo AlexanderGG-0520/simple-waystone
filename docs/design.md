@@ -64,19 +64,23 @@ The cost is checked without consuming items first. Items are only consumed after
 
 ## Public API Direction
 
-The initial command API is function-based. The desired simple UX is:
+The initial command API is function-based. The current implementation expects the macro argument as a JSON text component string:
 
-- `simple_waystone:admin/create_here {name:"Hub"}`
+- `/function simple_waystone:admin/create_here {name:'{"text":"Hub","color":"aqua","italic":false}'}`
+- `/function simple_waystone:admin/create_here {name:'{"text":"Mine","color":"gold","italic":false}'}`
 
-The current implementation expects the macro argument as a JSON text component string:
+The desired simple UX below is a future improvement, not current behavior:
 
-- `simple_waystone:admin/create_here {name:'{"text":"Hub","color":"aqua","italic":false}'}`
-- `simple_waystone:admin/list`
-- `simple_waystone:admin/delete_nearest`
-- `simple_waystone:admin/delete_all`
-- `simple_waystone:teleport/to_nearest`
-- `simple_waystone:debug/state`
-- `simple_waystone:debug/nearest`
+- `/function simple_waystone:admin/create_here {name:"Hub"}`
+
+Other public validation commands:
+
+- `/function simple_waystone:admin/list`
+- `/function simple_waystone:admin/delete_nearest`
+- `/function simple_waystone:admin/delete_all`
+- `/function simple_waystone:teleport/to_nearest`
+- `/function simple_waystone:debug/state`
+- `/function simple_waystone:debug/nearest`
 
 The create function uses Minecraft function macros for the name. Macro behavior must be validated on Minecraft Java Edition 26.1.2 before public distribution.
 

@@ -14,9 +14,10 @@ The creation function currently expects the `name` argument as a JSON text compo
 
 ```mcfunction
 /function simple_waystone:admin/create_here {name:'{"text":"Hub","color":"aqua","italic":false}'}
+/function simple_waystone:admin/create_here {name:'{"text":"Mine","color":"gold","italic":false}'}
 ```
 
-The simpler form below is not the format expected by the current implementation:
+The simpler form below is a future UX improvement, not the format expected by the current implementation:
 
 ```mcfunction
 /function simple_waystone:admin/create_here {name:"Hub"}

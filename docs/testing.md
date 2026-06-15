@@ -68,7 +68,7 @@ Expected:
 Move to a different location and run:
 
 ```mcfunction
-/function simple_waystone:admin/create_here {name:'{"text":"Mine","color":"aqua","italic":false}'}
+/function simple_waystone:admin/create_here {name:'{"text":"Mine","color":"gold","italic":false}'}
 ```
 
 Expected:
@@ -179,6 +179,7 @@ Run:
 Expected:
 
 - config storage contains the default creation cost;
+- there is currently no separate `simple_waystone:waystones` storage; waystone state is held on loaded armor stand entities and scoreboards;
 - `#next sws.id` equals the highest assigned id;
 - `sws.id`, `sws.tmp`, and `sws.has_cost` exist.
 
@@ -189,6 +190,14 @@ To inspect nearby waystone entity data, stand near one and run:
 ```
 
 Expected: entity data includes `Invisible`, `Invulnerable`, `NoGravity`, `PersistenceRequired`, `Silent`, `CustomName`, and the `sws.waystone` / `sws.clickable` tags.
+
+## Retest Right-Click Advancement
+
+The right-click reward function is expected to revoke the advancement automatically. If manual reset is needed while testing, run:
+
+```mcfunction
+/advancement revoke @s only simple_waystone:right_click_waystone
+```
 
 ## Expected Failure Cases
 
@@ -235,3 +244,26 @@ Run:
 while more than four blocks from any waystone.
 
 Expected: failure messages appear and no waystone is deleted.
+
+## Command Examples
+
+These commands are duplicated here as a compact copy-paste checklist. Each command is a single executable line.
+
+```mcfunction
+/reload
+/datapack list
+/give @s minecraft:lodestone 2
+/give @s minecraft:ender_eye 32
+/give @s minecraft:diamond_block 8
+/function simple_waystone:admin/create_here {name:'{"text":"Hub","color":"aqua","italic":false}'}
+/function simple_waystone:admin/create_here {name:'{"text":"Mine","color":"gold","italic":false}'}
+/function simple_waystone:admin/list
+/function simple_waystone:debug/state
+/function simple_waystone:debug/nearest
+/function simple_waystone:teleport/to_nearest
+/function simple_waystone:admin/delete_nearest
+/function simple_waystone:admin/delete_all
+/data get storage simple_waystone:config
+/data get entity @e[type=minecraft:armor_stand,tag=sws.waystone,sort=nearest,limit=1]
+/advancement revoke @s only simple_waystone:right_click_waystone
+```

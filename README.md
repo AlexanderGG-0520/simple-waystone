@@ -32,18 +32,17 @@ Run these commands as an operator or from an appropriate command context.
 
 ### Create a Named Waystone
 
-```mcfunction
-/function simple_waystone:admin/create_here {name:"Hub"}
-/function simple_waystone:admin/create_here {name:"Mining Base"}
-```
-
-The simpler command format above is the desired UX, but it is not the exact format expected by the current implementation.
-
-Current expected command format:
+The current implementation requires the `name` argument to be a JSON text component string:
 
 ```mcfunction
 /function simple_waystone:admin/create_here {name:'{"text":"Hub","color":"aqua","italic":false}'}
-/function simple_waystone:admin/create_here {name:'{"text":"Mining Base","color":"aqua","italic":false}'}
+/function simple_waystone:admin/create_here {name:'{"text":"Mine","color":"gold","italic":false}'}
+```
+
+The simpler command format below is a future UX improvement, not current behavior:
+
+```mcfunction
+/function simple_waystone:admin/create_here {name:"Hub"}
 ```
 
 This function uses Minecraft function macros. The `name` value is expected to be a JSON text component string used as the armor stand `CustomName`.
@@ -94,6 +93,29 @@ Using a waystone is free. The current prototype is expected to teleport the exec
 ```
 
 These functions print useful validation state without adding tick logic.
+
+## Command Examples
+
+All command examples are written as single executable lines for Minecraft chat or a server console with the leading slash where appropriate.
+
+```mcfunction
+/reload
+/datapack list
+/give @s minecraft:lodestone 2
+/give @s minecraft:ender_eye 32
+/give @s minecraft:diamond_block 8
+/function simple_waystone:admin/create_here {name:'{"text":"Hub","color":"aqua","italic":false}'}
+/function simple_waystone:admin/create_here {name:'{"text":"Mine","color":"gold","italic":false}'}
+/function simple_waystone:admin/list
+/function simple_waystone:debug/state
+/function simple_waystone:debug/nearest
+/function simple_waystone:teleport/to_nearest
+/function simple_waystone:admin/delete_nearest
+/function simple_waystone:admin/delete_all
+/data get storage simple_waystone:config
+/data get entity @e[type=minecraft:armor_stand,tag=sws.waystone,sort=nearest,limit=1]
+/advancement revoke @s only simple_waystone:right_click_waystone
+```
 
 ## Current Limitations
 
