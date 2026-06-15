@@ -1,0 +1,27 @@
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Editor and IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Minecraft runtime files
+world/
+worlds/
+saves/
+server.properties
+eula.txt
+logs/
+crash-reports/
+backups/
+
+# Datapack distribution archives
+*.zip
+
+# Temporary files
+tmp/
+temp/
+*.tmp
