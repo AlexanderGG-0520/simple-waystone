@@ -1,0 +1,16 @@
+{
+  "criteria": {
+    "right_click_waystone": {
+      "trigger": "minecraft:player_interacted_with_entity",
+      "conditions": {
+        "entity": {
+          "type": "minecraft:armor_stand",
+          "nbt": "{Tags:[\"sws.waystone\",\"sws.clickable\"]}"
+        }
+      }
+    }
+  },
+  "rewards": {
+    "function": "simple_waystone:interaction/right_click_waystone"
+  }
+}
