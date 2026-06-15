@@ -6,7 +6,7 @@ The project targets **Minecraft Java Edition 26.1.2** and data pack format **101
 
 ## Status
 
-Early development. The currently implemented prototype is designed to support visible waystone markers, multiple named waystone entities, expensive waystone creation, free waystone use, and armor stand right-click detection through an advancement. It still requires in-game validation on Minecraft Java Edition 26.1.2.
+Early development. The currently implemented prototype is designed to support visible waystone markers, multiple named waystone entities, expensive waystone creation, free waystone use, and right-click detection through a `minecraft:interaction` hitbox and advancement. It still requires in-game validation on Minecraft Java Edition 26.1.2.
 
 Right-clicking a waystone now opens a Java Edition datapack dialog-style destination menu. This is not a chest GUI and not a tellraw chat menu.
 
@@ -28,12 +28,13 @@ Right-clicking a waystone now opens a Java Edition datapack dialog-style destina
 
 ## Waystone Representation
 
-Waystones currently use two aligned entities:
+Waystones currently use three aligned entities:
 
 - a visible `minecraft:block_display` showing a lodestone block as a visual-only marker;
-- an invisible, invulnerable armor stand used for right-click interaction and teleport targeting.
+- an invisible `minecraft:interaction` entity used for right-click interaction and teleport targeting;
+- an invisible armor stand used only for the readable floating name label.
 
-The lodestone marker is not a real placed block, so creating a waystone should not modify or replace world blocks. Deleting a waystone removes both the visual marker and the clickable armor stand when their internal id matches.
+The lodestone marker is not a real placed block, so creating a waystone should not modify or replace world blocks. Deleting a waystone removes the visual marker, clickable interaction hitbox, and name label when their internal id matches.
 
 ## Player-Facing Creation
 
@@ -43,7 +44,7 @@ The current player-facing creation item is a custom echo-shard-based Waystone Co
 /function simple_waystone:item/give_core
 ```
 
-The helper gives a `minecraft:echo_shard` with a readable `minecraft:item_name`, a `minecraft:custom_data` marker, and a long-duration `minecraft:consumable` component so it can be used with right-click. The custom data, not the display name, is the intended item identity. Holding right-click with the Waystone Core is expected to create a visible waystone at the player's position if the player has the full creation cost.
+The helper gives a `minecraft:echo_shard` with a readable `minecraft:item_name`, a `minecraft:custom_data` marker, and a long-duration `minecraft:consumable` component so it can be used with right-click. The custom data, not the display name, is the intended item identity. Runtime validation confirmed that holding right-click with the Waystone Core creates a visible waystone at the player's position if the player has the full creation cost.
 
 The item-created waystone cost is:
 
@@ -54,7 +55,7 @@ The item-created waystone cost is:
 
 Item-created waystones currently receive a simple readable visible name, `Waystone`. Custom names are still available through the admin/testing function.
 
-Runtime testing showed `minecraft:item_used_on_block` does not fire for an echo shard. The item flow now uses the `minecraft:using_item` advancement trigger and rewards `simple_waystone:item/use_core`. This behavior still requires Minecraft Java Edition 26.1.2 runtime validation.
+Runtime testing showed `minecraft:item_used_on_block` does not fire for an echo shard. The item flow now uses the `minecraft:using_item` advancement trigger and rewards `simple_waystone:item/use_core`.
 
 ## Public Functions
 
@@ -73,7 +74,7 @@ The current implementation expects a plain string name:
 
 JSON text component arguments are intentionally avoided for now because runtime testing showed raw JSON could render in-world instead of a readable name.
 
-This function uses Minecraft function macros. The `name` value is inserted into a simple text component used as the armor stand `CustomName`.
+This function uses Minecraft function macros. The `name` value is inserted into a simple text component used as the name label armor stand `CustomName`.
 
 Creating a waystone consumes the configured creation cost only after the cost check passes.
 
@@ -94,7 +95,7 @@ The readable cost configuration is stored in `storage simple_waystone:config` by
 /function simple_waystone:admin/list
 ```
 
-Lists currently loaded waystone armor stand entities.
+Lists currently loaded waystone interaction hitbox entities.
 
 ### Delete Waystones
 
@@ -149,7 +150,8 @@ All command examples are written as single executable lines for Minecraft chat o
 /function simple_waystone:admin/delete_nearest
 /function simple_waystone:admin/delete_all
 /data get storage simple_waystone:config
-/data get entity @e[type=minecraft:armor_stand,tag=sws.waystone,sort=nearest,limit=1]
+/data get entity @e[type=minecraft:interaction,tag=sws.waystone,tag=sws.clickable,sort=nearest,limit=1]
+/data get entity @e[type=minecraft:armor_stand,tag=sws.waystone,tag=sws.label,sort=nearest,limit=1]
 /data get entity @e[type=minecraft:block_display,tag=sws.visual,sort=nearest,limit=1]
 /advancement revoke @s only simple_waystone:right_click_waystone
 /advancement revoke @s only simple_waystone:use_waystone_core
@@ -157,16 +159,16 @@ All command examples are written as single executable lines for Minecraft chat o
 
 ## Current Limitations
 
-- The prototype uses invisible, invulnerable armor stands instead of interaction entities because armor stands are the requested target for this project.
+- Runtime testing showed the invisible armor stand body was not a reliable right-click target, so new waystones use `minecraft:interaction` for the clickable hitbox.
 - The visible lodestone marker is a `block_display`, not a real block.
 - The Waystone Core uses `minecraft:echo_shard`; a lodestone-based core was rejected because it placed a real block during runtime testing.
-- The current Waystone Core item flow depends on `minecraft:using_item` matching `minecraft:custom_data`; this still needs runtime validation.
+- Runtime validation confirmed the current Waystone Core creation flow with `minecraft:using_item` and `minecraft:custom_data`.
 - The dialog menu is a fixed prototype for waystone ids 1 through 8; it does not dynamically list names yet.
-- The clickable armor stand intentionally does not use `Marker:1b`, because marker armor stands have a very small hitbox.
+- Armor stands are still used for readable name labels only, not as the clickable target.
 - Advancement rewards run as the player but do not provide a simple direct mcfunction handle for the clicked entity. The right-click handler therefore uses a nearest tagged waystone fallback within four blocks.
 - The function macro creation command must be revalidated on Minecraft Java Edition 26.1.2 after simplifying name handling.
 - The dialog syntax and `/trigger` action behavior require Minecraft Java Edition 26.1.2 runtime validation.
-- The latest fixes require another Minecraft Java Edition 26.1.2 runtime validation pass before public distribution.
+- The latest right-click hitbox and dialog-opening fixes require another Minecraft Java Edition 26.1.2 runtime validation pass before public distribution.
 
 See [docs/testing.md](docs/testing.md) and [docs/known-limitations.md](docs/known-limitations.md).
 

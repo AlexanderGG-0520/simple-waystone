@@ -21,31 +21,25 @@ The currently implemented prototype separates a waystone into three concerns:
 
 The visible marker is a `minecraft:block_display` rendering a lodestone block. It is visual-only and does not place or replace a real world block.
 
-The clickable interaction entity is still an invisible armor stand with:
+The clickable interaction entity is an invisible `minecraft:interaction` entity with:
 
 - tags `sws.waystone` and `sws.clickable`;
 - a stable numeric id in the `sws.id` scoreboard objective;
-- a visible `CustomName`;
+- a practical hitbox using `width:1.1f` and `height:1.5f`;
+- `response:1b` so interaction feedback behaves like a normal clickable target;
 - its actual entity position and dimension as the teleport target.
 
-The `block_display` also has the same `sws.id` value and the tags `sws.waystone` and `sws.visual`, so delete operations can remove both pieces together.
+The readable name is carried by a separate invisible armor stand tagged `sws.label`. The `block_display`, `interaction` entity, and label armor stand all have the same `sws.id` value, so delete operations can remove all pieces together.
 
 The design prefers teleporting to the clickable waystone entity itself instead of treating raw coordinates as the primary target. The entity naturally carries its dimension by existing in that dimension.
 
-## Armor Stand Interaction
+## Interaction Hitbox
 
-Right-click detection is implemented with an advancement in `data/simple_waystone/advancement/` using the `minecraft:player_interacted_with_entity` trigger. The predicate is intended to match only armor stands tagged as Simple Waystone entities, but it still requires in-game validation on Minecraft Java Edition 26.1.2.
+Right-click detection is implemented with an advancement in `data/simple_waystone/advancement/` using the `minecraft:player_interacted_with_entity` trigger. The predicate is intended to match only `minecraft:interaction` entities tagged as Simple Waystone clickable hitboxes, but it still requires in-game validation on Minecraft Java Edition 26.1.2.
 
-The armor stand is:
+Runtime validation showed that right-clicking the visible waystone body did not open the menu when the clickable target was an invisible armor stand. New waystones therefore keep the visual lodestone marker and readable armor stand label, but use a dedicated `minecraft:interaction` hitbox for clicks.
 
-- invisible;
-- invulnerable;
-- gravity-free;
-- persistent;
-- silent;
-- not marked with `Marker:1b`.
-
-`Marker:1b` is intentionally avoided because marker armor stands have an extremely small hitbox and are unreliable as right-click targets.
+The label armor stand is not tagged `sws.clickable` and is not used by the advancement. It uses `Marker:1b` only to remove its own hitbox so it cannot intercept clicks meant for the interaction entity. `Marker:1b` is not used on clickable entities.
 
 The advancement reward calls `simple_waystone:interaction/right_click_waystone`, which immediately revokes the advancement from the player so future interactions should be able to trigger again.
 
@@ -65,9 +59,9 @@ The Waystone Core is consumed during item-based creation. The item-created cost 
 
 ## Clicked Entity Resolution
 
-Vanilla advancement rewards run as the player, but this prototype does not assume a direct reliable mcfunction handle to the clicked entity. After the tagged armor stand advancement fires, the handler resolves the nearest tagged waystone within four blocks.
+Vanilla advancement rewards run as the player, but this prototype does not assume a direct reliable mcfunction handle to the clicked entity. After the tagged interaction advancement fires, the handler resolves the nearest tagged waystone within four blocks.
 
-This is a constrained fallback used to decide whether the player is close enough to a waystone to open the destination dialog. If this proves unreliable in Minecraft Java Edition 26.1.2, the armor stand approach should be documented as blocked before switching to another entity type.
+This is a constrained fallback used to decide whether the player is close enough to a waystone to open the destination dialog. If it proves unreliable in Minecraft Java Edition 26.1.2, the interaction hitbox dimensions or advancement predicate should be adjusted directly.
 
 ## Dialog Destination Menu
 
@@ -127,12 +121,12 @@ The create function uses Minecraft function macros for the name. Macro behavior 
 - The dialog menu is limited to waystone ids 1 through 8.
 - The dialog syntax and action behavior require Minecraft Java Edition 26.1.2 runtime validation.
 - Listing waystones only covers loaded waystone entities.
-- The latest echo-shard core and readable-name fixes require another Minecraft Java Edition 26.1.2 runtime validation pass.
+- Runtime validation confirmed echo-shard core creation, item consumption, visible marker creation, and readable display names.
 - The visible marker is a visual-only `block_display`, not a real lodestone block.
 - A lodestone-based Waystone Core was runtime-tested and rejected because it placed a real block.
-- `minecraft:using_item`, `minecraft:consumable`, and `minecraft:custom_data` item predicate syntax need runtime validation on Minecraft Java Edition 26.1.2.
-- Right-click detection may need adjustment after in-game testing.
-- Invisible armor stands may be hard for players to interact with.
+- The `minecraft:interaction` right-click hitbox and dialog-opening path need runtime validation on Minecraft Java Edition 26.1.2.
+- Right-click detection now uses `minecraft:interaction` and needs another in-game validation pass.
+- Existing waystones created by older prototype versions may still have armor stand click targets; recreate them after updating the datapack.
 - The nearest-waystone fallback may not always be the same as exact clicked-entity detection.
 - Function macro behavior must be validated on Minecraft Java Edition 26.1.2.
 - Creation cost is centralized but still limited by vanilla mcfunction command constraints.

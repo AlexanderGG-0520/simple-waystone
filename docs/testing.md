@@ -1,6 +1,6 @@
 # Manual In-Game Test Plan
 
-Some runtime validation has been performed, and it found the previous lodestone core and raw JSON name issues. Use this checklist in a disposable Minecraft Java Edition 26.1.2 test world to revalidate the current fixes before public distribution.
+Some runtime validation has been performed, and it confirmed the echo-shard Waystone Core creation flow after the previous lodestone core, echo-shard trigger, and raw JSON name issues were fixed. Use this checklist in a disposable Minecraft Java Edition 26.1.2 test world to validate the current right-click hitbox and dialog-opening fixes before public distribution.
 
 ## Install
 
@@ -76,7 +76,8 @@ Expected:
 
 - the Waystone Core, one normal lodestone, sixteen ender eyes, and four diamond blocks are consumed;
 - a visible lodestone `block_display` marker appears;
-- an invisible clickable armor stand with a readable visible name, `Waystone`, is created at the marker;
+- an invisible `minecraft:interaction` clickable hitbox is created at the marker;
+- an invisible armor stand name label with readable visible name, `Waystone`, is created at the marker;
 - a message similar to `[Simple Waystone] Created visible Waystone #1.` appears.
 
 Run:
@@ -85,7 +86,7 @@ Run:
 /function simple_waystone:debug/nearest
 ```
 
-Expected: the nearest clickable waystone id is printed.
+Expected: the nearest clickable interaction hitbox id is printed, and nearby visual marker / name label checks are shown.
 
 Run:
 
@@ -107,7 +108,8 @@ Expected:
 
 - one lodestone, sixteen ender eyes, and four diamond blocks are consumed;
 - a visible lodestone `block_display` marker appears;
-- an invisible armor stand with visible name `Hub` is created at the same location;
+- an invisible `minecraft:interaction` clickable hitbox is created at the same location;
+- an invisible armor stand with visible name `Hub` is created as the label;
 - a message similar to `[Simple Waystone] Created visible waystone #<id>.` appears.
 
 ## Create A Second Waystone Named Mine
@@ -121,7 +123,7 @@ Move to a different location and run:
 Expected:
 
 - the second set of cost items is consumed;
-- a second visible marker and named waystone armor stand are created;
+- a second visible marker, clickable interaction hitbox, and named label armor stand are created;
 - the created id advances.
 
 ## List Waystones
@@ -135,7 +137,7 @@ Run:
 Expected:
 
 - a `[Simple Waystone] Known loaded waystones:` message;
-- entries for loaded waystone armor stands with their scoreboard ids.
+- entries for loaded waystone interaction hitboxes with their scoreboard ids.
 
 Only waystones in loaded chunks are expected to appear.
 
@@ -167,22 +169,49 @@ Expected:
 - a `[Simple Waystone] Using nearest waystone for free.` message appears;
 - the player teleports to the nearest tagged waystone entity.
 
-## Test Right-Click Interaction
+## Test Right-Click Pipeline
 
-Stand near the visible lodestone marker and right-click where the invisible armor stand should be.
+Stand near the visible lodestone marker and inspect the clickable hitbox:
+
+```mcfunction
+/data get entity @e[type=minecraft:interaction,tag=sws.clickable,sort=nearest,limit=1]
+```
 
 Expected:
 
+- entity type is `minecraft:interaction`;
+- tags include `sws.waystone` and `sws.clickable`;
+- entity data includes reasonable `width`, `height`, and `response` values;
+- the matching id is stored in the `sws.id` scoreboard, not NBT.
+
+Then right-click the visible waystone body.
+
+Expected:
+
+- a `[Simple Waystone] Opening menu...` message appears;
 - the advancement reward runs;
 - the advancement is revoked after handling, allowing repeated tests;
 - the Simple Waystone dialog opens with destination buttons.
 - button labels are readable, such as `Waystone #1`.
 
+Right-click the same waystone again after closing the dialog.
+
+Expected:
+
+- the menu opens again, confirming the advancement was revoked.
+
+Summon or right-click an unrelated entity nearby.
+
+Expected:
+
+- unrelated entities do not open the Simple Waystone menu because the advancement predicate requires the tagged `minecraft:interaction` hitbox.
+
 If nothing happens:
 
-- verify the armor stand was created without `Marker:1b`;
+- verify the interaction hitbox exists with `sws.waystone` and `sws.clickable`;
 - run `/function simple_waystone:debug/nearest` while standing near the name;
-- try clicking around the visible marker and armor stand body, not only the floating name;
+- try clicking around the visible marker body, not only the floating name;
+- run `/advancement revoke @s only simple_waystone:right_click_waystone` and try again;
 - inspect logs for advancement or command parsing errors.
 
 ## Test Dialog Destination Selection
@@ -237,8 +266,9 @@ Stand within four blocks of one waystone and run:
 
 Expected:
 
-- the nearest waystone armor stand is killed;
+- the nearest waystone interaction hitbox is killed;
 - the matching visible `block_display` marker is killed;
+- the matching armor stand name label is killed;
 - no items are refunded;
 - a deletion message appears.
 
@@ -254,7 +284,7 @@ Run:
 
 Expected:
 
-- all loaded Simple Waystone clickable armor stands and visual markers are killed;
+- all loaded Simple Waystone clickable interaction hitboxes, visual markers, and name labels are killed;
 - no items are refunded.
 
 ## Inspect Storage And Scoreboards
@@ -270,17 +300,25 @@ Run:
 Expected:
 
 - config storage contains the default creation cost;
-- there is currently no separate `simple_waystone:waystones` storage; waystone state is held on loaded armor stand entities and scoreboards;
+- there is currently no separate `simple_waystone:waystones` storage; waystone state is held on loaded interaction entities and scoreboards;
 - `#next sws.id` equals the highest assigned id;
 - `sws.id`, `sws.tmp`, `sws.has_cost`, and `sws.select` exist.
 
-To inspect nearby waystone entity data, stand near one and run:
+To inspect nearby clickable waystone hitbox data, stand near one and run:
 
 ```mcfunction
-/data get entity @e[type=minecraft:armor_stand,tag=sws.waystone,sort=nearest,limit=1]
+/data get entity @e[type=minecraft:interaction,tag=sws.waystone,tag=sws.clickable,sort=nearest,limit=1]
 ```
 
-Expected: entity data includes `Invisible`, `Invulnerable`, `NoGravity`, `PersistenceRequired`, `Silent`, `CustomName`, and the `sws.waystone` / `sws.clickable` tags.
+Expected: entity data includes `width`, `height`, `response`, and the `sws.waystone` / `sws.clickable` tags.
+
+To inspect the readable name label, run:
+
+```mcfunction
+/data get entity @e[type=minecraft:armor_stand,tag=sws.waystone,tag=sws.label,sort=nearest,limit=1]
+```
+
+Expected: entity data includes `Invisible`, `Invulnerable`, `NoGravity`, `Marker`, `PersistenceRequired`, `Silent`, `CustomName`, and the `sws.waystone` / `sws.label` tags. The label armor stand is allowed to use `Marker:1b` because it is not the clickable entity.
 
 The rendered in-world name should be readable, such as `Waystone`, `Hub`, or `Mine`. It should not display raw JSON text such as `[{"text":"Waystone"...}]`.
 
@@ -323,7 +361,7 @@ Expected:
 
 - a Waystone Core missing-cost message appears;
 - the Waystone Core is not consumed;
-- no visible marker or clickable armor stand is created.
+- no visible marker, clickable interaction hitbox, or name label is created.
 
 If the message says the Waystone Core could not be consumed, inspect whether the custom echo shard was already removed or transformed before the reward function ran.
 
@@ -339,7 +377,7 @@ Expected:
 
 - no Simple Waystone creation message appears;
 - no cost items are consumed;
-- no waystone marker or clickable armor stand is created.
+- no waystone marker, clickable interaction hitbox, or name label is created.
 
 ### Advancement Repeats
 
@@ -404,7 +442,8 @@ These commands are duplicated here as a compact copy-paste checklist. Each comma
 /function simple_waystone:admin/delete_nearest
 /function simple_waystone:admin/delete_all
 /data get storage simple_waystone:config
-/data get entity @e[type=minecraft:armor_stand,tag=sws.waystone,sort=nearest,limit=1]
+/data get entity @e[type=minecraft:interaction,tag=sws.waystone,tag=sws.clickable,sort=nearest,limit=1]
+/data get entity @e[type=minecraft:armor_stand,tag=sws.waystone,tag=sws.label,sort=nearest,limit=1]
 /data get entity @e[type=minecraft:block_display,tag=sws.visual,sort=nearest,limit=1]
 /advancement revoke @s only simple_waystone:right_click_waystone
 /advancement revoke @s only simple_waystone:use_waystone_core

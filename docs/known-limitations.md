@@ -4,7 +4,7 @@ Simple Waystone is currently an implementation prototype that requires in-game v
 
 ## Runtime Validation
 
-- Runtime testing found the previous lodestone core and raw JSON name issues; the current echo-shard core and readable-name fixes still need revalidation on Minecraft Java Edition 26.1.2.
+- Runtime testing found and fixed the previous lodestone core, echo-shard trigger, and raw JSON name issues. The new interaction-hitbox right-click path still needs Minecraft Java Edition 26.1.2 runtime validation.
 - JSON files have been validated with `jq`, but command parsing and advancement behavior still need Minecraft runtime validation.
 - Function macro behavior must be tested on the target version.
 
@@ -19,18 +19,20 @@ The creation function currently expects a plain string `name` argument:
 
 JSON text component arguments are avoided because runtime testing showed they could render as raw JSON text in-world.
 
-## Armor Stand Interaction
+## Interaction Hitbox
 
-- Right-click detection may need adjustment after in-game testing.
-- Invisible armor stands may be hard for players to interact with, even without `Marker:1b`.
+- Runtime testing showed that the previous invisible armor stand click target did not open the dialog reliably.
+- New waystones use an invisible `minecraft:interaction` entity as the clickable hitbox and keep the armor stand only as a readable name label.
+- The `minecraft:interaction` advancement predicate and hitbox size need Minecraft Java Edition 26.1.2 runtime validation.
 - The visible lodestone marker is a `block_display`; it is not a real placed block and does not itself handle clicks.
-- The datapack intentionally does not use `Marker:1b` because marker armor stands have a very small hitbox.
+- The datapack does not use `Marker:1b` for clickable entities. The separate armor stand name label may use `Marker:1b` so it does not intercept clicks.
 - The current advancement reward does not use an exact clicked-entity handle. It resolves the nearest tagged waystone within four blocks after the advancement fires.
+- Existing waystones made before this change may need to be deleted and recreated so they receive the new interaction hitbox.
 
 ## Item-Based Creation
 
 - The current Waystone Core is a custom `minecraft:echo_shard` item with `minecraft:custom_data`.
-- The item component syntax and advancement item predicate syntax need runtime validation on Minecraft Java Edition 26.1.2.
+- Runtime validation confirmed the current echo-shard Waystone Core creation flow.
 - Detection uses `minecraft:using_item` with a long-duration `minecraft:consumable` component, not tick polling.
 - A normal `minecraft:echo_shard` should not match the advancement because it lacks the Simple Waystone custom data marker.
 - A lodestone-based Waystone Core was runtime-tested and rejected because it placed a real lodestone block.
