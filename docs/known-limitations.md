@@ -46,7 +46,9 @@ JSON text component arguments are avoided because runtime testing showed they co
 
 ## Prototype Scope
 
-- Destination selection is not implemented.
-- Teleporting currently targets the nearest tagged waystone entity within four blocks.
+- Destination selection uses a fixed Java Edition dialog with buttons for waystone ids 1 through 8.
+- Dialog JSON syntax and `/trigger` button action behavior require Minecraft Java Edition 26.1.2 runtime validation.
+- The dialog does not dynamically list waystone names and has no pagination yet.
+- Teleporting from the dialog targets the selected loaded waystone entity in the current dimension and is free.
 - Listing only includes loaded waystone entities.
-- No tick logic is used.
+- A lightweight tick function is used only to process players with pending `sws.select` trigger values.

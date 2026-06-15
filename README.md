@@ -8,7 +8,7 @@ The project targets **Minecraft Java Edition 26.1.2** and data pack format **101
 
 Early development. The currently implemented prototype is designed to support visible waystone markers, multiple named waystone entities, expensive waystone creation, free waystone use, and armor stand right-click detection through an advancement. It still requires in-game validation on Minecraft Java Edition 26.1.2.
 
-This is not a finished destination-selection system yet. The expected prototype behavior is that right-clicking a waystone resolves the nearest tagged waystone within four blocks and teleports the player to that same entity, which is mainly useful for validating the interaction path.
+Right-clicking a waystone now opens a Java Edition datapack dialog-style destination menu. This is not a chest GUI and not a tellraw chat menu.
 
 ## Installation
 
@@ -113,6 +113,12 @@ Deleting a waystone does not refund the creation cost.
 
 Using a waystone is free. The current prototype is expected to teleport the executing player to the nearest tagged waystone entity within four blocks.
 
+### Destination Dialog
+
+Right-clicking an existing waystone opens the `simple_waystone:destinations` dialog. The current prototype uses a fixed dialog with destination buttons for waystone ids 1 through 8.
+
+Dialog buttons run `/trigger sws.select set <id>`, so non-OP players can select destinations without direct `/function` access. A lightweight tick function processes only players with pending `sws.select` values, teleports them for free to a matching loaded waystone in the current dimension, and resets the selection score.
+
 ### Debug Functions
 
 ```mcfunction
@@ -139,6 +145,7 @@ All command examples are written as single executable lines for Minecraft chat o
 /function simple_waystone:debug/state
 /function simple_waystone:debug/nearest
 /function simple_waystone:teleport/to_nearest
+/trigger sws.select set 1
 /function simple_waystone:admin/delete_nearest
 /function simple_waystone:admin/delete_all
 /data get storage simple_waystone:config
@@ -154,10 +161,11 @@ All command examples are written as single executable lines for Minecraft chat o
 - The visible lodestone marker is a `block_display`, not a real block.
 - The Waystone Core uses `minecraft:echo_shard`; a lodestone-based core was rejected because it placed a real block during runtime testing.
 - The current Waystone Core item flow depends on `minecraft:using_item` matching `minecraft:custom_data`; this still needs runtime validation.
+- The dialog menu is a fixed prototype for waystone ids 1 through 8; it does not dynamically list names yet.
 - The clickable armor stand intentionally does not use `Marker:1b`, because marker armor stands have a very small hitbox.
 - Advancement rewards run as the player but do not provide a simple direct mcfunction handle for the clicked entity. The right-click handler therefore uses a nearest tagged waystone fallback within four blocks.
 - The function macro creation command must be revalidated on Minecraft Java Edition 26.1.2 after simplifying name handling.
-- Destination selection is not implemented yet.
+- The dialog syntax and `/trigger` action behavior require Minecraft Java Edition 26.1.2 runtime validation.
 - The latest fixes require another Minecraft Java Edition 26.1.2 runtime validation pass before public distribution.
 
 See [docs/testing.md](docs/testing.md) and [docs/known-limitations.md](docs/known-limitations.md).

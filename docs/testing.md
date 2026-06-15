@@ -175,7 +175,8 @@ Expected:
 
 - the advancement reward runs;
 - the advancement is revoked after handling, allowing repeated tests;
-- the same free nearest-waystone behavior runs.
+- the Simple Waystone dialog opens with destination buttons.
+- button labels are readable, such as `Waystone #1`.
 
 If nothing happens:
 
@@ -183,6 +184,48 @@ If nothing happens:
 - run `/function simple_waystone:debug/nearest` while standing near the name;
 - try clicking around the visible marker and armor stand body, not only the floating name;
 - inspect logs for advancement or command parsing errors.
+
+## Test Dialog Destination Selection
+
+Create at least two waystones, then right-click one of them to open the dialog.
+
+Expected:
+
+- the UI is the Java Edition dialog-style menu, not a chest GUI and not chat text;
+- the title is `Simple Waystone`;
+- the body says `Select a destination.`;
+- destination buttons are shown for `Waystone #1` through `Waystone #8`.
+
+Select an existing destination.
+
+Expected:
+
+- the dialog action runs `/trigger sws.select set <id>`;
+- the lightweight tick processor teleports the player to the selected loaded waystone entity in the current dimension;
+- no items are consumed;
+- `sws.select` resets to `0`, so the player is not repeatedly teleported.
+
+To inspect the selection score after teleporting, run:
+
+```mcfunction
+/scoreboard players get @s sws.select
+```
+
+Expected: the score is `0`.
+
+Delete a waystone, then open the dialog and select its old id.
+
+Expected:
+
+- a clear error says the selected waystone is not available in this loaded dimension;
+- no items are consumed;
+- `sws.select` resets to `0`.
+
+Test with a non-OP player if possible.
+
+Expected:
+
+- the player can use the dialog because the button action uses `/trigger`, not direct `/function` execution.
 
 ## Delete The Nearest Waystone
 
@@ -229,7 +272,7 @@ Expected:
 - config storage contains the default creation cost;
 - there is currently no separate `simple_waystone:waystones` storage; waystone state is held on loaded armor stand entities and scoreboards;
 - `#next sws.id` equals the highest assigned id;
-- `sws.id`, `sws.tmp`, and `sws.has_cost` exist.
+- `sws.id`, `sws.tmp`, `sws.has_cost`, and `sws.select` exist.
 
 To inspect nearby waystone entity data, stand near one and run:
 
@@ -357,6 +400,7 @@ These commands are duplicated here as a compact copy-paste checklist. Each comma
 /function simple_waystone:debug/state
 /function simple_waystone:debug/nearest
 /function simple_waystone:teleport/to_nearest
+/trigger sws.select set 1
 /function simple_waystone:admin/delete_nearest
 /function simple_waystone:admin/delete_all
 /data get storage simple_waystone:config
@@ -366,12 +410,16 @@ These commands are duplicated here as a compact copy-paste checklist. Each comma
 /advancement revoke @s only simple_waystone:use_waystone_core
 ```
 
-## Removed Polling Check
+## Tick Processing Check
 
-Verify that item creation no longer uses tick polling:
+Verify that item creation no longer uses tick polling, and that the only tick hook is for dialog selection processing:
 
 ```mcfunction
 /scoreboard objectives list
 ```
 
-Expected: there is no item-use polling objective for the Waystone Core flow, and there is no `data/minecraft/tags/function/tick.json` file in the datapack.
+Expected:
+
+- there is no item-use polling objective for the Waystone Core flow;
+- `sws.select` exists as a trigger objective;
+- `data/minecraft/tags/function/tick.json` points to `simple_waystone:internal/process_selection`.

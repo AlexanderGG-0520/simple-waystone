@@ -67,7 +67,23 @@ The Waystone Core is consumed during item-based creation. The item-created cost 
 
 Vanilla advancement rewards run as the player, but this prototype does not assume a direct reliable mcfunction handle to the clicked entity. After the tagged armor stand advancement fires, the handler resolves the nearest tagged waystone within four blocks.
 
-This is a constrained fallback, not a destination-selection system. If this proves unreliable in Minecraft Java Edition 26.1.2, the armor stand approach should be documented as blocked before switching to another entity type.
+This is a constrained fallback used to decide whether the player is close enough to a waystone to open the destination dialog. If this proves unreliable in Minecraft Java Edition 26.1.2, the armor stand approach should be documented as blocked before switching to another entity type.
+
+## Dialog Destination Menu
+
+Right-clicking a waystone opens a Java Edition datapack dialog from `data/simple_waystone/dialog/destinations.json`. The dialog is intended to use the vanilla dialog UI, not a chest/container GUI and not a tellraw chat menu.
+
+The first implementation is intentionally static: it has buttons for waystone ids 1 through 8. Datapack dialog JSON cannot currently enumerate arbitrary waystone entities and names at runtime in this prototype, so labels are `Waystone #1` through `Waystone #8`.
+
+Each button runs a non-OP-safe trigger command:
+
+```mcfunction
+/trigger sws.select set 1
+```
+
+`simple_waystone:menu/open` enables `sws.select` for the player before showing the dialog. A lightweight tick function then processes only players with pending `sws.select` values, teleports them to the matching loaded waystone entity in the current dimension, and resets the score. This keeps command execution out of direct `/function` access for normal players.
+
+Selecting a deleted, missing, unloaded, cross-dimension, or out-of-range waystone id shows an error and consumes no items. Teleporting remains free.
 
 ## Cost Model
 
@@ -102,13 +118,14 @@ Other public validation commands:
 - `/function simple_waystone:teleport/to_nearest`
 - `/function simple_waystone:debug/state`
 - `/function simple_waystone:debug/nearest`
+- `/trigger sws.select set <id>` through dialog button actions
 
 The create function uses Minecraft function macros for the name. Macro behavior must be validated on Minecraft Java Edition 26.1.2 before public distribution.
 
 ## Known Limitations
 
-- Destination list UI is not implemented.
-- The current right-click behavior teleports the player to the same nearest waystone entity, primarily validating interaction and entity resolution.
+- The dialog menu is limited to waystone ids 1 through 8.
+- The dialog syntax and action behavior require Minecraft Java Edition 26.1.2 runtime validation.
 - Listing waystones only covers loaded waystone entities.
 - The latest echo-shard core and readable-name fixes require another Minecraft Java Edition 26.1.2 runtime validation pass.
 - The visible marker is a visual-only `block_display`, not a real lodestone block.
