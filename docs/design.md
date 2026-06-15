@@ -13,7 +13,7 @@ Simple Waystone is intended to be a small server-side waystone datapack for Mine
 
 ## Multi-Waystone Prototype
 
-The prototype represents each waystone as an in-world armor stand entity with:
+The currently implemented prototype is designed to represent each waystone as an in-world armor stand entity with:
 
 - tags `sws.waystone` and `sws.clickable`;
 - a stable numeric id in the `sws.id` scoreboard objective;
@@ -24,7 +24,7 @@ The design prefers teleporting to the waystone entity itself instead of treating
 
 ## Armor Stand Interaction
 
-Right-click detection uses an advancement in `data/simple_waystone/advancement/` with the `minecraft:player_interacted_with_entity` trigger. The predicate only matches armor stands tagged as Simple Waystone entities.
+Right-click detection is implemented with an advancement in `data/simple_waystone/advancement/` using the `minecraft:player_interacted_with_entity` trigger. The predicate is intended to match only armor stands tagged as Simple Waystone entities, but it still requires in-game validation on Minecraft Java Edition 26.1.2.
 
 The armor stand is:
 
@@ -37,7 +37,7 @@ The armor stand is:
 
 `Marker:1b` is intentionally avoided because marker armor stands have an extremely small hitbox and are unreliable as right-click targets.
 
-The advancement reward calls `simple_waystone:interaction/right_click_waystone`, which immediately revokes the advancement from the player so future interactions can trigger again.
+The advancement reward calls `simple_waystone:interaction/right_click_waystone`, which immediately revokes the advancement from the player so future interactions should be able to trigger again.
 
 ## Clicked Entity Resolution
 
@@ -64,15 +64,21 @@ The cost is checked without consuming items first. Items are only consumed after
 
 ## Public API Direction
 
-The initial command API is function-based:
+The initial command API is function-based. The desired simple UX is:
 
 - `simple_waystone:admin/create_here {name:"Hub"}`
+
+The current implementation expects the macro argument as a JSON text component string:
+
+- `simple_waystone:admin/create_here {name:'{"text":"Hub","color":"aqua","italic":false}'}`
 - `simple_waystone:admin/list`
 - `simple_waystone:admin/delete_nearest`
 - `simple_waystone:admin/delete_all`
 - `simple_waystone:teleport/to_nearest`
+- `simple_waystone:debug/state`
+- `simple_waystone:debug/nearest`
 
-The create function uses Minecraft function macros for the name. Names should stay simple and should not contain embedded quotes.
+The create function uses Minecraft function macros for the name. Macro behavior must be validated on Minecraft Java Edition 26.1.2 before public distribution.
 
 ## Known Limitations
 
@@ -80,7 +86,14 @@ The create function uses Minecraft function macros for the name. Names should st
 - The current right-click behavior teleports the player to the same nearest waystone entity, primarily validating interaction and entity resolution.
 - Listing waystones only covers loaded waystone entities.
 - Runtime behavior has not been tested in Minecraft Java Edition 26.1.2 from this repository.
+- Right-click detection may need adjustment after in-game testing.
+- Invisible armor stands may be hard for players to interact with.
+- The nearest-waystone fallback may not always be the same as exact clicked-entity detection.
+- Function macro behavior must be validated on Minecraft Java Edition 26.1.2.
+- Creation cost is centralized but still limited by vanilla mcfunction command constraints.
 - Command syntax is written for current vanilla datapack conventions, but Minecraft 26.1.2 runtime validation is still required.
+
+See `docs/testing.md` for the manual validation plan and `docs/known-limitations.md` for a focused limitation summary.
 
 ## Target
 

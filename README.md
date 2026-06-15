@@ -6,9 +6,9 @@ The project targets **Minecraft Java Edition 26.1.2** and data pack format **101
 
 ## Status
 
-Early development. The current prototype supports multiple named waystone marker entities, expensive waystone creation, free waystone use, and armor stand right-click detection through an advancement.
+Early development. The currently implemented prototype is designed to support multiple named waystone marker entities, expensive waystone creation, free waystone use, and armor stand right-click detection through an advancement. It still requires in-game validation on Minecraft Java Edition 26.1.2.
 
-This is not a finished destination-selection system yet. Right-clicking a waystone currently resolves the nearest tagged waystone within four blocks and teleports the player to that same entity, which is mainly useful for validating the interaction path.
+This is not a finished destination-selection system yet. The expected prototype behavior is that right-clicking a waystone resolves the nearest tagged waystone within four blocks and teleports the player to that same entity, which is mainly useful for validating the interaction path.
 
 ## Installation
 
@@ -37,7 +37,16 @@ Run these commands as an operator or from an appropriate command context.
 /function simple_waystone:admin/create_here {name:"Mining Base"}
 ```
 
-This function uses Minecraft function macros. The `name` value is inserted into the armor stand `CustomName`, so keep names simple and avoid embedded quotes.
+The simpler command format above is the desired UX, but it is not the exact format expected by the current implementation.
+
+Current expected command format:
+
+```mcfunction
+/function simple_waystone:admin/create_here {name:'{"text":"Hub","color":"aqua","italic":false}'}
+/function simple_waystone:admin/create_here {name:'{"text":"Mining Base","color":"aqua","italic":false}'}
+```
+
+This function uses Minecraft function macros. The `name` value is expected to be a JSON text component string used as the armor stand `CustomName`.
 
 Creating a waystone consumes the configured creation cost only after the cost check passes.
 
@@ -75,15 +84,27 @@ Deleting a waystone does not refund the creation cost.
 /function simple_waystone:teleport/to_nearest
 ```
 
-Using a waystone is free. The current prototype teleports the executing player to the nearest tagged waystone entity within four blocks.
+Using a waystone is free. The current prototype is expected to teleport the executing player to the nearest tagged waystone entity within four blocks.
+
+### Debug Functions
+
+```mcfunction
+/function simple_waystone:debug/state
+/function simple_waystone:debug/nearest
+```
+
+These functions print useful validation state without adding tick logic.
 
 ## Current Limitations
 
 - The prototype uses invisible, invulnerable armor stands instead of interaction entities because armor stands are the requested target for this project.
 - The clickable armor stand intentionally does not use `Marker:1b`, because marker armor stands have a very small hitbox.
 - Advancement rewards run as the player but do not provide a simple direct mcfunction handle for the clicked entity. The right-click handler therefore uses a nearest tagged waystone fallback within four blocks.
+- The function macro creation command must be validated on Minecraft Java Edition 26.1.2. The current expected format passes `name` as a JSON text component string.
 - Destination selection is not implemented yet.
 - Runtime behavior has not been validated in Minecraft Java Edition 26.1.2 from this repository.
+
+See [docs/testing.md](docs/testing.md) and [docs/known-limitations.md](docs/known-limitations.md).
 
 ## Target Version
 
