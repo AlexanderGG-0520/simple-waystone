@@ -53,11 +53,11 @@ The advancement reward calls `simple_waystone:interaction/right_click_waystone`,
 
 Player-facing creation uses a custom echo-shard-based Waystone Core item. A lodestone-based core was removed after runtime testing confirmed that it placed a real lodestone block when used.
 
-The previous polling-based prototype was removed. The current design uses a `minecraft:item_used_on_block` advancement that matches a `minecraft:echo_shard` carrying `minecraft:custom_data`:
+The previous polling-based prototype was removed. Runtime testing also showed that `minecraft:item_used_on_block` does not fire for echo shards. The current design gives the custom echo shard a long-duration `minecraft:consumable` component and uses a `minecraft:using_item` advancement that matches a `minecraft:echo_shard` carrying `minecraft:custom_data`:
 
 - `simple_waystone:{core:1b}`
 
-The advancement reward calls `simple_waystone:item/use_core` and immediately revokes `simple_waystone:use_waystone_core` so the item can trigger repeatedly.
+The advancement reward calls `simple_waystone:item/use_core` and immediately revokes `simple_waystone:use_waystone_core` so the item can trigger repeatedly. The reward function also verifies that the player is still holding the custom core before consuming anything.
 
 This keeps normal usage item-free after creation: the expensive cost is paid only when a waystone is created, and teleporting remains free.
 
@@ -113,7 +113,7 @@ The create function uses Minecraft function macros for the name. Macro behavior 
 - The latest echo-shard core and readable-name fixes require another Minecraft Java Edition 26.1.2 runtime validation pass.
 - The visible marker is a visual-only `block_display`, not a real lodestone block.
 - A lodestone-based Waystone Core was runtime-tested and rejected because it placed a real block.
-- `minecraft:item_used_on_block` behavior and `minecraft:custom_data` item predicate syntax need runtime validation on Minecraft Java Edition 26.1.2.
+- `minecraft:using_item`, `minecraft:consumable`, and `minecraft:custom_data` item predicate syntax need runtime validation on Minecraft Java Edition 26.1.2.
 - Right-click detection may need adjustment after in-game testing.
 - Invisible armor stands may be hard for players to interact with.
 - The nearest-waystone fallback may not always be the same as exact clicked-entity detection.

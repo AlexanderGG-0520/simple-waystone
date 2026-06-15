@@ -43,7 +43,7 @@ The current player-facing creation item is a custom echo-shard-based Waystone Co
 /function simple_waystone:item/give_core
 ```
 
-The helper gives a `minecraft:echo_shard` with a custom name and `minecraft:custom_data` marker. The custom data, not the display name, is the intended item identity. Right-clicking a block with the Waystone Core is expected to create a visible waystone at the player's position if the player has the full creation cost.
+The helper gives a `minecraft:echo_shard` with a readable `minecraft:item_name`, a `minecraft:custom_data` marker, and a long-duration `minecraft:consumable` component so it can be used with right-click. The custom data, not the display name, is the intended item identity. Holding right-click with the Waystone Core is expected to create a visible waystone at the player's position if the player has the full creation cost.
 
 The item-created waystone cost is:
 
@@ -54,7 +54,7 @@ The item-created waystone cost is:
 
 Item-created waystones currently receive a simple readable visible name, `Waystone`. Custom names are still available through the admin/testing function.
 
-The item flow uses `minecraft:item_used_on_block` advancement detection and rewards `simple_waystone:item/use_core`. This behavior still requires Minecraft Java Edition 26.1.2 runtime validation.
+Runtime testing showed `minecraft:item_used_on_block` does not fire for an echo shard. The item flow now uses the `minecraft:using_item` advancement trigger and rewards `simple_waystone:item/use_core`. This behavior still requires Minecraft Java Edition 26.1.2 runtime validation.
 
 ## Public Functions
 
@@ -153,7 +153,7 @@ All command examples are written as single executable lines for Minecraft chat o
 - The prototype uses invisible, invulnerable armor stands instead of interaction entities because armor stands are the requested target for this project.
 - The visible lodestone marker is a `block_display`, not a real block.
 - The Waystone Core uses `minecraft:echo_shard`; a lodestone-based core was rejected because it placed a real block during runtime testing.
-- The current Waystone Core item flow depends on `minecraft:item_used_on_block` matching `minecraft:custom_data`; this still needs runtime validation.
+- The current Waystone Core item flow depends on `minecraft:using_item` matching `minecraft:custom_data`; this still needs runtime validation.
 - The clickable armor stand intentionally does not use `Marker:1b`, because marker armor stands have a very small hitbox.
 - Advancement rewards run as the player but do not provide a simple direct mcfunction handle for the clicked entity. The right-click handler therefore uses a nearest tagged waystone fallback within four blocks.
 - The function macro creation command must be revalidated on Minecraft Java Edition 26.1.2 after simplifying name handling.

@@ -31,9 +31,10 @@ JSON text component arguments are avoided because runtime testing showed they co
 
 - The current Waystone Core is a custom `minecraft:echo_shard` item with `minecraft:custom_data`.
 - The item component syntax and advancement item predicate syntax need runtime validation on Minecraft Java Edition 26.1.2.
-- Detection uses `minecraft:item_used_on_block`, not tick polling.
+- Detection uses `minecraft:using_item` with a long-duration `minecraft:consumable` component, not tick polling.
 - A normal `minecraft:echo_shard` should not match the advancement because it lacks the Simple Waystone custom data marker.
 - A lodestone-based Waystone Core was runtime-tested and rejected because it placed a real lodestone block.
+- `minecraft:item_used_on_block` was runtime-tested and did not fire for echo shard use.
 - The exact clicked block position may not be directly available to the reward function, so the current prototype creates the waystone at the player position.
 - Item-created waystones use a simple readable name, `Waystone`. Custom naming currently uses the admin/testing function.
 

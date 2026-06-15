@@ -61,14 +61,16 @@ After running `simple_waystone:item/give_core`, hold the received item and run:
 Expected:
 
 - the item id is `minecraft:echo_shard`;
-- the item has a custom name similar to `Waystone Core`;
+- the item displays a readable name, `Waystone Core`, not raw JSON text;
+- the item has an item name component similar to `Waystone Core`;
 - the item has `minecraft:custom_data` containing `simple_waystone:{core:1b}`.
+- the item has a `minecraft:consumable` component so right-click can trigger `minecraft:using_item`.
 
 The custom data is the important identity marker. A normal `minecraft:echo_shard` should not trigger waystone creation.
 
 ## Create A Visible Waystone With The Core Item
 
-Right-click a block with the Waystone Core received from `simple_waystone:item/give_core`.
+Hold right-click with the Waystone Core received from `simple_waystone:item/give_core`. Test both while looking at air and while looking at a block.
 
 Expected:
 
@@ -272,7 +274,7 @@ Expected:
 - no waystone is created;
 - the next id does not advance.
 
-Also test the item flow without cost by right-clicking a block with a Waystone Core.
+Also test the item flow without cost by holding right-click with a Waystone Core.
 
 Expected:
 
@@ -284,7 +286,7 @@ If the message says the Waystone Core could not be consumed, inspect whether the
 
 ### Normal Echo Shard Does Not Trigger
 
-Hold a normal echo shard and right-click a block:
+Hold a normal echo shard and right-click:
 
 ```mcfunction
 /give @s minecraft:echo_shard 1
@@ -298,7 +300,7 @@ Expected:
 
 ### Advancement Repeats
 
-Create or receive another Waystone Core and right-click a block again after the first successful or failed test.
+Create or receive another Waystone Core and hold right-click again after the first successful or failed test.
 
 Expected:
 
