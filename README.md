@@ -37,20 +37,22 @@ The lodestone marker is not a real placed block, so creating a waystone should n
 
 ## Player-Facing Creation
 
-The current player-facing creation item is a custom lodestone-based Waystone Core. Use the helper function to receive one:
+The current player-facing creation item is a custom echo-shard-based Waystone Core. Runtime testing showed that a lodestone-based core placed a real lodestone block, so the core uses the non-placeable `minecraft:echo_shard` item instead. Use the helper function to receive one:
 
 ```mcfunction
 /function simple_waystone:item/give_core
 ```
 
-The helper gives a `minecraft:lodestone` with a custom name and `minecraft:custom_data` marker. The custom data, not the display name, is the intended item identity. Right-clicking a block with the Waystone Core is expected to create a visible waystone at the player's position if the player has the remaining creation cost.
+The helper gives a `minecraft:echo_shard` with a custom name and `minecraft:custom_data` marker. The custom data, not the display name, is the intended item identity. Right-clicking a block with the Waystone Core is expected to create a visible waystone at the player's position if the player has the full creation cost.
 
-Because the Waystone Core is itself a lodestone and is consumed during creation, it counts as the lodestone part of the cost. The remaining item-created waystone cost is:
+The item-created waystone cost is:
 
+- Waystone Core x1
+- `minecraft:lodestone` x1
 - `minecraft:ender_eye` x16
 - `minecraft:diamond_block` x4
 
-Item-created waystones currently receive a generated visible name like `Waystone #<id>`. Custom names are still available through the admin/testing function.
+Item-created waystones currently receive a simple readable visible name, `Waystone`. Custom names are still available through the admin/testing function.
 
 The item flow uses `minecraft:item_used_on_block` advancement detection and rewards `simple_waystone:item/use_core`. This behavior still requires Minecraft Java Edition 26.1.2 runtime validation.
 
@@ -62,20 +64,16 @@ Run these commands as an operator or from an appropriate command context.
 
 This admin/testing function remains available for precise named creation:
 
-The current implementation requires the `name` argument to be a JSON text component string:
-
-```mcfunction
-/function simple_waystone:admin/create_here {name:'{"text":"Hub","color":"aqua","italic":false}'}
-/function simple_waystone:admin/create_here {name:'{"text":"Mine","color":"gold","italic":false}'}
-```
-
-The simpler command format below is a future UX improvement, not current behavior:
+The current implementation expects a plain string name:
 
 ```mcfunction
 /function simple_waystone:admin/create_here {name:"Hub"}
+/function simple_waystone:admin/create_here {name:"Mine"}
 ```
 
-This function uses Minecraft function macros. The `name` value is expected to be a JSON text component string used as the armor stand `CustomName`.
+JSON text component arguments are intentionally avoided for now because runtime testing showed raw JSON could render in-world instead of a readable name.
+
+This function uses Minecraft function macros. The `name` value is inserted into a simple text component used as the armor stand `CustomName`.
 
 Creating a waystone consumes the configured creation cost only after the cost check passes.
 
@@ -131,12 +129,12 @@ All command examples are written as single executable lines for Minecraft chat o
 ```mcfunction
 /reload
 /datapack list
-/give @s minecraft:lodestone 2
+/give @s minecraft:lodestone 3
 /give @s minecraft:ender_eye 48
 /give @s minecraft:diamond_block 12
 /function simple_waystone:item/give_core
-/function simple_waystone:admin/create_here {name:'{"text":"Hub","color":"aqua","italic":false}'}
-/function simple_waystone:admin/create_here {name:'{"text":"Mine","color":"gold","italic":false}'}
+/function simple_waystone:admin/create_here {name:"Hub"}
+/function simple_waystone:admin/create_here {name:"Mine"}
 /function simple_waystone:admin/list
 /function simple_waystone:debug/state
 /function simple_waystone:debug/nearest
@@ -154,12 +152,13 @@ All command examples are written as single executable lines for Minecraft chat o
 
 - The prototype uses invisible, invulnerable armor stands instead of interaction entities because armor stands are the requested target for this project.
 - The visible lodestone marker is a `block_display`, not a real block.
+- The Waystone Core uses `minecraft:echo_shard`; a lodestone-based core was rejected because it placed a real block during runtime testing.
 - The current Waystone Core item flow depends on `minecraft:item_used_on_block` matching `minecraft:custom_data`; this still needs runtime validation.
 - The clickable armor stand intentionally does not use `Marker:1b`, because marker armor stands have a very small hitbox.
 - Advancement rewards run as the player but do not provide a simple direct mcfunction handle for the clicked entity. The right-click handler therefore uses a nearest tagged waystone fallback within four blocks.
-- The function macro creation command must be validated on Minecraft Java Edition 26.1.2. The current expected format passes `name` as a JSON text component string.
+- The function macro creation command must be revalidated on Minecraft Java Edition 26.1.2 after simplifying name handling.
 - Destination selection is not implemented yet.
-- Runtime behavior has not been validated in Minecraft Java Edition 26.1.2 from this repository.
+- The latest fixes require another Minecraft Java Edition 26.1.2 runtime validation pass before public distribution.
 
 See [docs/testing.md](docs/testing.md) and [docs/known-limitations.md](docs/known-limitations.md).
 

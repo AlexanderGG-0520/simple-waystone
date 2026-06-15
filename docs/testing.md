@@ -1,6 +1,6 @@
 # Manual In-Game Test Plan
 
-This datapack has not yet been runtime-tested in Minecraft Java Edition 26.1.2. Use this checklist in a disposable test world before public distribution.
+Some runtime validation has been performed, and it found the previous lodestone core and raw JSON name issues. Use this checklist in a disposable Minecraft Java Edition 26.1.2 test world to revalidate the current fixes before public distribution.
 
 ## Install
 
@@ -42,13 +42,13 @@ If this function is unknown, check that the datapack installed with `pack.mcmeta
 Run:
 
 ```mcfunction
-/give @s minecraft:lodestone 2
+/give @s minecraft:lodestone 3
 /give @s minecraft:ender_eye 48
 /give @s minecraft:diamond_block 12
 /function simple_waystone:item/give_core
 ```
 
-This gives enough normal lodestones for two admin-created waystones plus the remaining cost items for one Waystone Core-created waystone.
+This gives enough items for one Waystone Core-created waystone and two admin-created waystones.
 
 ## Verify Waystone Core Identity
 
@@ -60,11 +60,11 @@ After running `simple_waystone:item/give_core`, hold the received item and run:
 
 Expected:
 
-- the item id is `minecraft:lodestone`;
+- the item id is `minecraft:echo_shard`;
 - the item has a custom name similar to `Waystone Core`;
 - the item has `minecraft:custom_data` containing `simple_waystone:{core:1b}`.
 
-The custom data is the important identity marker. A normal `minecraft:lodestone` should not trigger waystone creation.
+The custom data is the important identity marker. A normal `minecraft:echo_shard` should not trigger waystone creation.
 
 ## Create A Visible Waystone With The Core Item
 
@@ -72,9 +72,9 @@ Right-click a block with the Waystone Core received from `simple_waystone:item/g
 
 Expected:
 
-- the Waystone Core, sixteen ender eyes, and four diamond blocks are consumed;
+- the Waystone Core, one normal lodestone, sixteen ender eyes, and four diamond blocks are consumed;
 - a visible lodestone `block_display` marker appears;
-- an invisible clickable armor stand with a visible generated name like `Waystone #1` is created at the marker;
+- an invisible clickable armor stand with a readable visible name, `Waystone`, is created at the marker;
 - a message similar to `[Simple Waystone] Created visible Waystone #1.` appears.
 
 Run:
@@ -95,10 +95,10 @@ Expected: the nearest visual marker has a lodestone `block_state` and the `sws.w
 
 ## Create A Waystone Named Hub
 
-The current implementation expects `name` to be a JSON text component string passed through a function macro:
+The current implementation expects a plain string `name` passed through a function macro:
 
 ```mcfunction
-/function simple_waystone:admin/create_here {name:'{"text":"Hub","color":"aqua","italic":false}'}
+/function simple_waystone:admin/create_here {name:"Hub"}
 ```
 
 Expected:
@@ -113,7 +113,7 @@ Expected:
 Move to a different location and run:
 
 ```mcfunction
-/function simple_waystone:admin/create_here {name:'{"text":"Mine","color":"gold","italic":false}'}
+/function simple_waystone:admin/create_here {name:"Mine"}
 ```
 
 Expected:
@@ -237,6 +237,8 @@ To inspect nearby waystone entity data, stand near one and run:
 
 Expected: entity data includes `Invisible`, `Invulnerable`, `NoGravity`, `PersistenceRequired`, `Silent`, `CustomName`, and the `sws.waystone` / `sws.clickable` tags.
 
+The rendered in-world name should be readable, such as `Waystone`, `Hub`, or `Mine`. It should not display raw JSON text such as `[{"text":"Waystone"...}]`.
+
 To inspect the visual marker, run:
 
 ```mcfunction
@@ -260,7 +262,7 @@ The right-click reward function is expected to revoke the advancement automatica
 Without the required items, run:
 
 ```mcfunction
-/function simple_waystone:admin/create_here {name:'{"text":"No Cost","color":"aqua","italic":false}'}
+/function simple_waystone:admin/create_here {name:"NoCost"}
 ```
 
 Expected:
@@ -278,14 +280,14 @@ Expected:
 - the Waystone Core is not consumed;
 - no visible marker or clickable armor stand is created.
 
-If the message says the Waystone Core could not be consumed, inspect whether Minecraft placed the custom lodestone as a real block before the advancement reward ran. That would mean this trigger design needs adjustment.
+If the message says the Waystone Core could not be consumed, inspect whether the custom echo shard was already removed or transformed before the reward function ran.
 
-### Normal Lodestone Does Not Trigger
+### Normal Echo Shard Does Not Trigger
 
-Hold a normal lodestone and right-click a block:
+Hold a normal echo shard and right-click a block:
 
 ```mcfunction
-/give @s minecraft:lodestone 1
+/give @s minecraft:echo_shard 1
 ```
 
 Expected:
@@ -313,11 +315,15 @@ Run:
 
 Expected: Minecraft should reject or fail the macro invocation because `name` is required by macro lines. No commands in the function should run.
 
-### Invalid Name Component
+### Complex Admin Names Are Not Supported Yet
 
-Run a command with malformed JSON in `name`.
+Run a simple plain name first:
 
-Expected: Minecraft should fail to parse the expanded macro command. No cost should be consumed if the macro function fails before execution.
+```mcfunction
+/function simple_waystone:admin/create_here {name:"Hub"}
+```
+
+Expected: the in-world name is readable. Avoid embedded quotes or JSON text components in `name`; the prototype intentionally keeps admin names conservative after runtime testing showed raw JSON could render in-world.
 
 ### No Nearby Waystone
 
@@ -339,12 +345,12 @@ These commands are duplicated here as a compact copy-paste checklist. Each comma
 ```mcfunction
 /reload
 /datapack list
-/give @s minecraft:lodestone 2
+/give @s minecraft:lodestone 3
 /give @s minecraft:ender_eye 48
 /give @s minecraft:diamond_block 12
 /function simple_waystone:item/give_core
-/function simple_waystone:admin/create_here {name:'{"text":"Hub","color":"aqua","italic":false}'}
-/function simple_waystone:admin/create_here {name:'{"text":"Mine","color":"gold","italic":false}'}
+/function simple_waystone:admin/create_here {name:"Hub"}
+/function simple_waystone:admin/create_here {name:"Mine"}
 /function simple_waystone:admin/list
 /function simple_waystone:debug/state
 /function simple_waystone:debug/nearest

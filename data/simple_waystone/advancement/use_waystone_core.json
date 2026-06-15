@@ -4,7 +4,7 @@
       "trigger": "minecraft:item_used_on_block",
       "conditions": {
         "item": {
-          "items": "minecraft:lodestone",
+          "items": "minecraft:echo_shard",
           "predicates": {
             "minecraft:custom_data": "{simple_waystone:{core:1b}}"
           }

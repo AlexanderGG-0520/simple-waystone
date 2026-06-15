@@ -51,9 +51,9 @@ The advancement reward calls `simple_waystone:interaction/right_click_waystone`,
 
 ## Item-Based Creation
 
-Player-facing creation uses a custom lodestone-based Waystone Core item.
+Player-facing creation uses a custom echo-shard-based Waystone Core item. A lodestone-based core was removed after runtime testing confirmed that it placed a real lodestone block when used.
 
-The previous polling-based prototype was removed. The current design uses a `minecraft:item_used_on_block` advancement that matches a `minecraft:lodestone` carrying `minecraft:custom_data`:
+The previous polling-based prototype was removed. The current design uses a `minecraft:item_used_on_block` advancement that matches a `minecraft:echo_shard` carrying `minecraft:custom_data`:
 
 - `simple_waystone:{core:1b}`
 
@@ -61,7 +61,7 @@ The advancement reward calls `simple_waystone:item/use_core` and immediately rev
 
 This keeps normal usage item-free after creation: the expensive cost is paid only when a waystone is created, and teleporting remains free.
 
-The Waystone Core is consumed during item-based creation and counts as the lodestone part of the cost. The remaining item-created cost is 16 ender eyes and 4 diamond blocks. The admin/testing function `simple_waystone:admin/create_here` still exists because it supports precise macro-provided names and is useful for validation, server operators, and debugging. Item-based creation currently uses a generated name like `Waystone #<id>`.
+The Waystone Core is consumed during item-based creation. The item-created cost is the core, one normal lodestone, 16 ender eyes, and 4 diamond blocks. The admin/testing function `simple_waystone:admin/create_here` still exists because it supports conservative macro-provided plain names and is useful for validation, server operators, and debugging. Item-based creation currently uses a simple readable name, `Waystone`.
 
 ## Clicked Entity Resolution
 
@@ -88,14 +88,10 @@ The cost is checked without consuming items first. Items are only consumed after
 
 ## Public API Direction
 
-The initial command API is function-based. The current implementation expects the macro argument as a JSON text component string:
-
-- `/function simple_waystone:admin/create_here {name:'{"text":"Hub","color":"aqua","italic":false}'}`
-- `/function simple_waystone:admin/create_here {name:'{"text":"Mine","color":"gold","italic":false}'}`
-
-The desired simple UX below is a future improvement, not current behavior:
+The initial admin command API is function-based. The current implementation expects a plain string macro argument:
 
 - `/function simple_waystone:admin/create_here {name:"Hub"}`
+- `/function simple_waystone:admin/create_here {name:"Mine"}`
 
 Other public validation commands:
 
@@ -114,8 +110,9 @@ The create function uses Minecraft function macros for the name. Macro behavior 
 - Destination list UI is not implemented.
 - The current right-click behavior teleports the player to the same nearest waystone entity, primarily validating interaction and entity resolution.
 - Listing waystones only covers loaded waystone entities.
-- Runtime behavior has not been tested in Minecraft Java Edition 26.1.2 from this repository.
+- The latest echo-shard core and readable-name fixes require another Minecraft Java Edition 26.1.2 runtime validation pass.
 - The visible marker is a visual-only `block_display`, not a real lodestone block.
+- A lodestone-based Waystone Core was runtime-tested and rejected because it placed a real block.
 - `minecraft:item_used_on_block` behavior and `minecraft:custom_data` item predicate syntax need runtime validation on Minecraft Java Edition 26.1.2.
 - Right-click detection may need adjustment after in-game testing.
 - Invisible armor stands may be hard for players to interact with.

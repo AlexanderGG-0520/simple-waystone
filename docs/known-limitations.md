@@ -4,26 +4,20 @@ Simple Waystone is currently an implementation prototype that requires in-game v
 
 ## Runtime Validation
 
-- The datapack has not yet been runtime-tested in Minecraft Java Edition 26.1.2.
+- Runtime testing found the previous lodestone core and raw JSON name issues; the current echo-shard core and readable-name fixes still need revalidation on Minecraft Java Edition 26.1.2.
 - JSON files have been validated with `jq`, but command parsing and advancement behavior still need Minecraft runtime validation.
 - Function macro behavior must be tested on the target version.
 
 ## Function Macros
 
-The creation function currently expects the `name` argument as a JSON text component string:
-
-```mcfunction
-/function simple_waystone:admin/create_here {name:'{"text":"Hub","color":"aqua","italic":false}'}
-/function simple_waystone:admin/create_here {name:'{"text":"Mine","color":"gold","italic":false}'}
-```
-
-The simpler form below is a future UX improvement, not the format expected by the current implementation:
+The creation function currently expects a plain string `name` argument:
 
 ```mcfunction
 /function simple_waystone:admin/create_here {name:"Hub"}
+/function simple_waystone:admin/create_here {name:"Mine"}
 ```
 
-This may become possible later with a separate wrapper or stricter name sanitization, but directly injecting arbitrary text into JSON/NBT command syntax is fragile.
+JSON text component arguments are avoided because runtime testing showed they could render as raw JSON text in-world.
 
 ## Armor Stand Interaction
 
@@ -35,13 +29,13 @@ This may become possible later with a separate wrapper or stricter name sanitiza
 
 ## Item-Based Creation
 
-- The current Waystone Core is a custom `minecraft:lodestone` item with `minecraft:custom_data`.
+- The current Waystone Core is a custom `minecraft:echo_shard` item with `minecraft:custom_data`.
 - The item component syntax and advancement item predicate syntax need runtime validation on Minecraft Java Edition 26.1.2.
 - Detection uses `minecraft:item_used_on_block`, not tick polling.
-- A normal `minecraft:lodestone` should not match the advancement because it lacks the Simple Waystone custom data marker.
-- Because the current Waystone Core is lodestone-based, in-game testing must confirm whether right-clicking a block places the item as a real lodestone before the advancement reward runs. If it does, this trigger design needs adjustment before public distribution.
+- A normal `minecraft:echo_shard` should not match the advancement because it lacks the Simple Waystone custom data marker.
+- A lodestone-based Waystone Core was runtime-tested and rejected because it placed a real lodestone block.
 - The exact clicked block position may not be directly available to the reward function, so the current prototype creates the waystone at the player position.
-- Item-created waystones use generated names like `Waystone #<id>`. Custom naming currently uses the admin/testing function.
+- Item-created waystones use a simple readable name, `Waystone`. Custom naming currently uses the admin/testing function.
 
 ## Cost Configuration
 
