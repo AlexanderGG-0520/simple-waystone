@@ -1,7 +1,9 @@
-# Advancement reward for right-clicking a tagged waystone interaction hitbox.
-# The advancement is revoked so future right-clicks can trigger again.
-
 advancement revoke @s only simple_waystone:right_click_waystone
-execute unless entity @e[type=minecraft:interaction,tag=sws.waystone,tag=sws.clickable,distance=..4,sort=nearest,limit=1] run tellraw @s [{"text":"[Simple Waystone] ","color":"gold"},{"text":"Waystone interaction detected, but no nearby waystone could be resolved.","color":"red"}]
-execute if entity @e[type=minecraft:interaction,tag=sws.waystone,tag=sws.clickable,distance=..4,sort=nearest,limit=1] run tellraw @s [{"text":"[Simple Waystone] ","color":"gold"},{"text":"Opening menu...","color":"gray"}]
-execute if entity @e[type=minecraft:interaction,tag=sws.waystone,tag=sws.clickable,distance=..4,sort=nearest,limit=1] run function simple_waystone:menu/open
+
+execute if data entity @s SelectedItem{id:"minecraft:name_tag"} if data entity @s SelectedItem.components."minecraft:custom_name" run function simple_waystone:rename/from_mainhand
+execute if data entity @s SelectedItem{id:"minecraft:name_tag"} unless data entity @s SelectedItem.components."minecraft:custom_name" if data entity @s SelectedItem.components."minecraft:item_name" run function simple_waystone:rename/from_mainhand
+
+execute unless data entity @s SelectedItem{id:"minecraft:name_tag"} run tellraw @s {"text":"[Simple Waystone] Opening menu...","color":"gray"}
+execute unless data entity @s SelectedItem{id:"minecraft:name_tag"} run function simple_waystone:menu/open
+
+execute if data entity @s SelectedItem{id:"minecraft:name_tag"} unless data entity @s SelectedItem.components."minecraft:custom_name" unless data entity @s SelectedItem.components."minecraft:item_name" run tellraw @s {"text":"[Simple Waystone] Rename requires a renamed Name Tag.","color":"red"}
