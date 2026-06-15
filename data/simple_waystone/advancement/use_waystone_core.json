@@ -1,0 +1,18 @@
+{
+  "criteria": {
+    "use_waystone_core": {
+      "trigger": "minecraft:item_used_on_block",
+      "conditions": {
+        "item": {
+          "items": "minecraft:lodestone",
+          "predicates": {
+            "minecraft:custom_data": "{simple_waystone:{core:1b}}"
+          }
+        }
+      }
+    }
+  },
+  "rewards": {
+    "function": "simple_waystone:item/use_core"
+  }
+}

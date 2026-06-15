@@ -35,10 +35,12 @@ This may become possible later with a separate wrapper or stricter name sanitiza
 
 ## Item-Based Creation
 
-- The current Waystone Core is a prototype trigger based on `minecraft:carrot_on_a_stick`.
-- The helper currently gives a plain carrot on a stick instead of a custom-named item because item component syntax still needs runtime validation on Minecraft Java Edition 26.1.2.
-- Detection uses the `minecraft.used:minecraft.carrot_on_a_stick` scoreboard statistic and a lightweight tick function.
-- Any carrot on a stick use may trigger the prototype creation path. A fully custom filtered item requires future validation against Minecraft Java Edition 26.1.2 item component syntax.
+- The current Waystone Core is a custom `minecraft:lodestone` item with `minecraft:custom_data`.
+- The item component syntax and advancement item predicate syntax need runtime validation on Minecraft Java Edition 26.1.2.
+- Detection uses `minecraft:item_used_on_block`, not tick polling.
+- A normal `minecraft:lodestone` should not match the advancement because it lacks the Simple Waystone custom data marker.
+- Because the current Waystone Core is lodestone-based, in-game testing must confirm whether right-clicking a block places the item as a real lodestone before the advancement reward runs. If it does, this trigger design needs adjustment before public distribution.
+- The exact clicked block position may not be directly available to the reward function, so the current prototype creates the waystone at the player position.
 - Item-created waystones use generated names like `Waystone #<id>`. Custom naming currently uses the admin/testing function.
 
 ## Cost Configuration

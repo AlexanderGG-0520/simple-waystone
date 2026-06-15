@@ -37,21 +37,22 @@ The lodestone marker is not a real placed block, so creating a waystone should n
 
 ## Player-Facing Creation
 
-The current player-facing creation item is a prototype Waystone Core trigger based on `minecraft:carrot_on_a_stick`. Use the helper function to receive one:
+The current player-facing creation item is a custom lodestone-based Waystone Core. Use the helper function to receive one:
 
 ```mcfunction
 /function simple_waystone:item/give_core
 ```
 
-The helper currently gives a plain carrot on a stick to avoid unvalidated custom item component syntax before Minecraft runtime testing. Using the carrot on a stick is expected to create a visible waystone at the player's position if the player has the full creation cost. The creation item itself is not part of the cost; the expensive cost remains:
+The helper gives a `minecraft:lodestone` with a custom name and `minecraft:custom_data` marker. The custom data, not the display name, is the intended item identity. Right-clicking a block with the Waystone Core is expected to create a visible waystone at the player's position if the player has the remaining creation cost.
 
-- `minecraft:lodestone` x1
+Because the Waystone Core is itself a lodestone and is consumed during creation, it counts as the lodestone part of the cost. The remaining item-created waystone cost is:
+
 - `minecraft:ender_eye` x16
 - `minecraft:diamond_block` x4
 
 Item-created waystones currently receive a generated visible name like `Waystone #<id>`. Custom names are still available through the admin/testing function.
 
-The item flow uses a lightweight `tick` function to poll the `minecraft.used:minecraft.carrot_on_a_stick` statistic. This exists only to detect player item use and is intentionally small.
+The item flow uses `minecraft:item_used_on_block` advancement detection and rewards `simple_waystone:item/use_core`. This behavior still requires Minecraft Java Edition 26.1.2 runtime validation.
 
 ## Public Functions
 
@@ -130,7 +131,7 @@ All command examples are written as single executable lines for Minecraft chat o
 ```mcfunction
 /reload
 /datapack list
-/give @s minecraft:lodestone 3
+/give @s minecraft:lodestone 2
 /give @s minecraft:ender_eye 48
 /give @s minecraft:diamond_block 12
 /function simple_waystone:item/give_core
@@ -146,13 +147,14 @@ All command examples are written as single executable lines for Minecraft chat o
 /data get entity @e[type=minecraft:armor_stand,tag=sws.waystone,sort=nearest,limit=1]
 /data get entity @e[type=minecraft:block_display,tag=sws.visual,sort=nearest,limit=1]
 /advancement revoke @s only simple_waystone:right_click_waystone
+/advancement revoke @s only simple_waystone:use_waystone_core
 ```
 
 ## Current Limitations
 
 - The prototype uses invisible, invulnerable armor stands instead of interaction entities because armor stands are the requested target for this project.
 - The visible lodestone marker is a `block_display`, not a real block.
-- The current Waystone Core item flow uses any `minecraft:carrot_on_a_stick` use as the trigger. Custom item filtering still needs a future validated implementation.
+- The current Waystone Core item flow depends on `minecraft:item_used_on_block` matching `minecraft:custom_data`; this still needs runtime validation.
 - The clickable armor stand intentionally does not use `Marker:1b`, because marker armor stands have a very small hitbox.
 - Advancement rewards run as the player but do not provide a simple direct mcfunction handle for the clicked entity. The right-click handler therefore uses a nearest tagged waystone fallback within four blocks.
 - The function macro creation command must be validated on Minecraft Java Edition 26.1.2. The current expected format passes `name` as a JSON text component string.

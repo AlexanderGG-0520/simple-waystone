@@ -51,13 +51,17 @@ The advancement reward calls `simple_waystone:interaction/right_click_waystone`,
 
 ## Item-Based Creation
 
-Player-facing creation uses a prototype Waystone Core item based on `minecraft:carrot_on_a_stick`.
+Player-facing creation uses a custom lodestone-based Waystone Core item.
 
-The datapack adds a lightweight tick hook because the vanilla use statistic for carrot on a stick is the simplest practical way to detect this item use without adding a custom UI. The tick function only checks players whose `sws.use_core` score changed and then immediately resets that score.
+The previous polling-based prototype was removed. The current design uses a `minecraft:item_used_on_block` advancement that matches a `minecraft:lodestone` carrying `minecraft:custom_data`:
+
+- `simple_waystone:{core:1b}`
+
+The advancement reward calls `simple_waystone:item/use_core` and immediately revokes `simple_waystone:use_waystone_core` so the item can trigger repeatedly.
 
 This keeps normal usage item-free after creation: the expensive cost is paid only when a waystone is created, and teleporting remains free.
 
-The admin/testing function `simple_waystone:admin/create_here` still exists because it supports precise macro-provided names and is useful for validation, server operators, and debugging. Item-based creation currently uses a generated name like `Waystone #<id>`.
+The Waystone Core is consumed during item-based creation and counts as the lodestone part of the cost. The remaining item-created cost is 16 ender eyes and 4 diamond blocks. The admin/testing function `simple_waystone:admin/create_here` still exists because it supports precise macro-provided names and is useful for validation, server operators, and debugging. Item-based creation currently uses a generated name like `Waystone #<id>`.
 
 ## Clicked Entity Resolution
 
@@ -112,8 +116,7 @@ The create function uses Minecraft function macros for the name. Macro behavior 
 - Listing waystones only covers loaded waystone entities.
 - Runtime behavior has not been tested in Minecraft Java Edition 26.1.2 from this repository.
 - The visible marker is a visual-only `block_display`, not a real lodestone block.
-- The current Waystone Core trigger uses any `minecraft:carrot_on_a_stick` use; a fully custom filtered item needs future runtime validation.
-- The lightweight tick hook exists only for item-use detection.
+- `minecraft:item_used_on_block` behavior and `minecraft:custom_data` item predicate syntax need runtime validation on Minecraft Java Edition 26.1.2.
 - Right-click detection may need adjustment after in-game testing.
 - Invisible armor stands may be hard for players to interact with.
 - The nearest-waystone fallback may not always be the same as exact clicked-entity detection.

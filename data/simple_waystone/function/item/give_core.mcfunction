@@ -1,5 +1,5 @@
-# Give the current player-facing Waystone Core trigger item.
-# Current prototype detection uses minecraft.used:minecraft.carrot_on_a_stick.
+# Give the player-facing Waystone Core item.
+# Component syntax is written for Minecraft Java Edition 26.1.2 and needs runtime validation.
 
-give @s minecraft:carrot_on_a_stick 1
-tellraw @s [{"text":"[Simple Waystone] ","color":"gold"},{"text":"Received a Waystone Core prototype item. Use the carrot on a stick to create a waystone if you have the full cost.","color":"gray"}]
+give @s minecraft:lodestone[minecraft:custom_name='{"text":"Waystone Core","color":"aqua","italic":false}',minecraft:custom_data={simple_waystone:{core:1b}}] 1
+tellraw @s [{"text":"[Simple Waystone] ","color":"gold"},{"text":"Received a Waystone Core. Right-click a block with it to create a waystone if you have the remaining cost.","color":"gray"}]

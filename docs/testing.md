@@ -42,21 +42,37 @@ If this function is unknown, check that the datapack installed with `pack.mcmeta
 Run:
 
 ```mcfunction
-/give @s minecraft:lodestone 3
+/give @s minecraft:lodestone 2
 /give @s minecraft:ender_eye 48
 /give @s minecraft:diamond_block 12
 /function simple_waystone:item/give_core
 ```
 
-This gives enough cost items for three default-cost waystones and one prototype Waystone Core trigger item.
+This gives enough normal lodestones for two admin-created waystones plus the remaining cost items for one Waystone Core-created waystone.
 
-## Create A Visible Waystone With The Core Item
+## Verify Waystone Core Identity
 
-Use the carrot on a stick received from `simple_waystone:item/give_core`.
+After running `simple_waystone:item/give_core`, hold the received item and run:
+
+```mcfunction
+/data get entity @s SelectedItem
+```
 
 Expected:
 
-- one lodestone, sixteen ender eyes, and four diamond blocks are consumed;
+- the item id is `minecraft:lodestone`;
+- the item has a custom name similar to `Waystone Core`;
+- the item has `minecraft:custom_data` containing `simple_waystone:{core:1b}`.
+
+The custom data is the important identity marker. A normal `minecraft:lodestone` should not trigger waystone creation.
+
+## Create A Visible Waystone With The Core Item
+
+Right-click a block with the Waystone Core received from `simple_waystone:item/give_core`.
+
+Expected:
+
+- the Waystone Core, sixteen ender eyes, and four diamond blocks are consumed;
 - a visible lodestone `block_display` marker appears;
 - an invisible clickable armor stand with a visible generated name like `Waystone #1` is created at the marker;
 - a message similar to `[Simple Waystone] Created visible Waystone #1.` appears.
@@ -211,7 +227,7 @@ Expected:
 - config storage contains the default creation cost;
 - there is currently no separate `simple_waystone:waystones` storage; waystone state is held on loaded armor stand entities and scoreboards;
 - `#next sws.id` equals the highest assigned id;
-- `sws.id`, `sws.tmp`, `sws.has_cost`, and `sws.use_core` exist.
+- `sws.id`, `sws.tmp`, and `sws.has_cost` exist.
 
 To inspect nearby waystone entity data, stand near one and run:
 
@@ -254,13 +270,38 @@ Expected:
 - no waystone is created;
 - the next id does not advance.
 
-Also test the item flow without cost by using the carrot on a stick.
+Also test the item flow without cost by right-clicking a block with a Waystone Core.
 
 Expected:
 
 - a Waystone Core missing-cost message appears;
-- no extra items are consumed;
+- the Waystone Core is not consumed;
 - no visible marker or clickable armor stand is created.
+
+If the message says the Waystone Core could not be consumed, inspect whether Minecraft placed the custom lodestone as a real block before the advancement reward ran. That would mean this trigger design needs adjustment.
+
+### Normal Lodestone Does Not Trigger
+
+Hold a normal lodestone and right-click a block:
+
+```mcfunction
+/give @s minecraft:lodestone 1
+```
+
+Expected:
+
+- no Simple Waystone creation message appears;
+- no cost items are consumed;
+- no waystone marker or clickable armor stand is created.
+
+### Advancement Repeats
+
+Create or receive another Waystone Core and right-click a block again after the first successful or failed test.
+
+Expected:
+
+- the `simple_waystone:use_waystone_core` advancement has been revoked by `simple_waystone:item/use_core`;
+- the trigger can fire again.
 
 ### Missing Macro Argument
 
@@ -298,7 +339,7 @@ These commands are duplicated here as a compact copy-paste checklist. Each comma
 ```mcfunction
 /reload
 /datapack list
-/give @s minecraft:lodestone 3
+/give @s minecraft:lodestone 2
 /give @s minecraft:ender_eye 48
 /give @s minecraft:diamond_block 12
 /function simple_waystone:item/give_core
@@ -314,4 +355,15 @@ These commands are duplicated here as a compact copy-paste checklist. Each comma
 /data get entity @e[type=minecraft:armor_stand,tag=sws.waystone,sort=nearest,limit=1]
 /data get entity @e[type=minecraft:block_display,tag=sws.visual,sort=nearest,limit=1]
 /advancement revoke @s only simple_waystone:right_click_waystone
+/advancement revoke @s only simple_waystone:use_waystone_core
 ```
+
+## Removed Polling Check
+
+Verify that item creation no longer uses tick polling:
+
+```mcfunction
+/scoreboard objectives list
+```
+
+Expected: there is no item-use polling objective for the Waystone Core flow, and there is no `data/minecraft/tags/function/tick.json` file in the datapack.
