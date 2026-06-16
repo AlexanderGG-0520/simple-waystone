@@ -59,6 +59,16 @@ This keeps normal usage item-free after creation: the expensive cost is paid onl
 
 The Waystone Core is consumed during item-based creation. The item-created cost is the core, one normal lodestone, 16 ender eyes, and 4 diamond blocks. The admin/testing function `simple_waystone:admin/create_here` still exists because it supports conservative macro-provided plain names and is useful for validation, server operators, and debugging. Item-based creation currently uses a simple readable name, `Waystone`.
 
+## Survival Core Source
+
+Endermen are the survival source for Waystone Cores. They match the teleportation theme, connect the item to End dimension progression, and make the core feel like a rare infrastructure component rather than a routine crafting ingredient.
+
+The Enderman loot table keeps the vanilla ender pearl pool and adds a separate rare Waystone Core pool. The rare pool only rolls when the Enderman is killed by a player. Its intended chance is 0.5% without Looting, scaling through `minecraft:random_chance_with_enchanted_bonus` to about 2% at Looting III.
+
+Enderman farms can make Waystone Cores more available after End progression. That is intentional: once a server has reached the End and invested in infrastructure, waystones should become practical to expand without making early-game teleport networks cheap.
+
+The Waystone Core item component definition is duplicated in the Enderman loot table because vanilla loot tables describe dropped item stacks directly and cannot call `simple_waystone:item/give_core`. Keep this loot table item definition aligned with `data/simple_waystone/function/item/give_core.mcfunction`.
+
 ## Clicked Entity Resolution
 
 Vanilla advancement rewards run as the player, but this prototype does not assume a direct reliable mcfunction handle to the clicked entity. After the tagged interaction advancement fires, the handler resolves the nearest tagged waystone within four blocks.

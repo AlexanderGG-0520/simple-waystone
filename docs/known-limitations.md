@@ -40,6 +40,12 @@ JSON text component arguments are avoided because runtime testing showed they co
 - The exact clicked block position may not be directly available to the reward function, so the current prototype creates the waystone at the player position.
 - Item-created waystones use a simple readable name, `Waystone`. Custom naming currently uses the admin/testing function.
 
+## Loot Table Compatibility
+
+- The datapack overrides the vanilla Enderman loot table at `data/minecraft/loot_table/entities/enderman.json`.
+- The override preserves normal Enderman ender pearl drops and adds a separate rare Waystone Core pool.
+- Other datapacks that also modify the Enderman loot table may conflict. Whichever pack supplies the active `minecraft:entities/enderman` loot table will control the combined behavior.
+
 ## Cost Configuration
 
 - The readable default cost is centralized in `storage simple_waystone:config`.

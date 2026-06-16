@@ -46,6 +46,20 @@ The current player-facing creation item is a custom echo-shard-based Waystone Co
 
 The helper gives a `minecraft:echo_shard` with a readable `minecraft:item_name`, a `minecraft:custom_data` marker, and a long-duration `minecraft:consumable` component so it can be used with right-click. The custom data, not the display name, is the intended item identity. Runtime validation confirmed that holding right-click with the Waystone Core creates a visible waystone at the player's position if the player has the full creation cost.
 
+## Obtaining Waystone Core
+
+In survival play, Waystone Cores can rarely drop from Endermen when the Enderman is killed by a player. The intended chance is 0.5% without Looting, increasing modestly with Looting up to about 2% at Looting III.
+
+The drop is a custom `minecraft:echo_shard` with the same Waystone Core item components and `minecraft:custom_data` marker as `simple_waystone:item/give_core`. A normal echo shard is still not a Waystone Core.
+
+The helper function remains available for admin/debug use:
+
+```mcfunction
+/function simple_waystone:item/give_core
+```
+
+The datapack overrides the vanilla Enderman entity loot table to preserve normal ender pearl drops and add a separate rare Waystone Core pool.
+
 The item-created waystone cost is:
 
 - Waystone Core x1

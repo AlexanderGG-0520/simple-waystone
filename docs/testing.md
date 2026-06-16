@@ -430,6 +430,44 @@ Expected:
 - no cost items are consumed;
 - no waystone marker, clickable interaction hitbox, or name label is created.
 
+## Test Enderman Waystone Core Drops
+
+After `/reload`, verify that the Enderman loot table loads. If the datapack fails to reload or the server log reports a loot table parse error for `minecraft:entities/enderman`, inspect `data/minecraft/loot_table/entities/enderman.json`.
+
+Use `/loot` or repeated Enderman kills to confirm normal Enderman drops still work. Normal ender pearl drops should remain possible because the vanilla pearl pool is preserved separately from the rare Waystone Core pool.
+
+Confirm the Waystone Core can drop from Endermen killed by a player. The intended chance is low: 0.5% without Looting, increasing to about 2% at Looting III. A small test sample may show no core drops.
+
+When a Waystone Core drops, compare it with one from the helper function:
+
+```mcfunction
+/function simple_waystone:item/give_core
+/data get entity @s Inventory
+```
+
+Expected:
+
+- both items are `minecraft:echo_shard`;
+- both have readable `minecraft:item_name` text `Waystone Core`;
+- both have `minecraft:custom_data` containing `simple_waystone:{core:1b}`;
+- both have the long-duration `minecraft:consumable` component used by the right-click creation flow.
+
+Confirm a normal echo shard still does not create a waystone:
+
+```mcfunction
+/give @s minecraft:echo_shard 1
+```
+
+Hold the normal echo shard and right-click. Expected: no Simple Waystone creation message, no cost item consumption, and no new waystone entities.
+
+Confirm the dropped Waystone Core can create a waystone. With the dropped core in hand and the full creation cost available, hold right-click.
+
+Expected:
+
+- the dropped Waystone Core, one lodestone, sixteen ender eyes, and four diamond blocks are consumed;
+- a visible waystone is created;
+- `/function simple_waystone:debug/nearest` shows the newly created waystone.
+
 ### Advancement Repeats
 
 Create or receive another Waystone Core and hold right-click again after the first successful or failed test.
